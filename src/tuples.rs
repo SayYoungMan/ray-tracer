@@ -1,17 +1,15 @@
 const EPSILON: f64 = 1e-5;
 
-#[derive(Debug)]
-struct SpatialTuple(f64, f64, f64, f64);
-
-impl SpatialTuple {
-    pub fn new_point(x: f64, y: f64, z: f64) -> Self {
-        Self(x, y, z, 1.0)
-    }
-
-    pub fn new_vector(x: f64, y: f64, z: f64) -> Self {
-        Self(x, y, z, 0.0)
-    }
+pub fn new_point(x: f64, y: f64, z: f64) -> SpatialTuple {
+    SpatialTuple(x, y, z, 1.0)
 }
+
+pub fn new_vector(x: f64, y: f64, z: f64) -> SpatialTuple {
+    SpatialTuple(x, y, z, 0.0)
+}
+
+#[derive(Debug)]
+pub struct SpatialTuple(f64, f64, f64, f64);
 
 impl PartialEq for SpatialTuple {
     fn eq(&self, other: &Self) -> bool {
@@ -88,14 +86,14 @@ mod tests {
 
     #[test]
     fn point_creates_tuple_with_w1() {
-        let p = SpatialTuple::new_point(4.0, -4.0, 3.0);
+        let p = new_point(4.0, -4.0, 3.0);
 
         assert_eq!(p, SpatialTuple(4.0, -4.0, 3.0, 1.0));
     }
 
     #[test]
     fn vector_creates_tuple_with_w0() {
-        let v = SpatialTuple::new_vector(4.0, -4.0, 3.0);
+        let v = new_vector(4.0, -4.0, 3.0);
 
         assert_eq!(v, SpatialTuple(4.0, -4.0, 3.0, 0.0));
     }
@@ -110,29 +108,29 @@ mod tests {
 
     #[test]
     fn subtracting_two_points() {
-        let p1 = SpatialTuple::new_point(3.0, 2.0, 1.0);
-        let p2 = SpatialTuple::new_point(5.0, 6.0, 7.0);
+        let p1 = new_point(3.0, 2.0, 1.0);
+        let p2 = new_point(5.0, 6.0, 7.0);
 
         // Notice that you get a vector from subtracting two points
-        assert_eq!(p1 - p2, SpatialTuple::new_vector(-2.0, -4.0, -6.0));
+        assert_eq!(p1 - p2, new_vector(-2.0, -4.0, -6.0));
     }
 
     #[test]
     fn subtracting_vector_from_point() {
-        let p = SpatialTuple::new_point(3.0, 2.0, 1.0);
-        let v = SpatialTuple::new_vector(5.0, 6.0, 7.0);
+        let p = new_point(3.0, 2.0, 1.0);
+        let v = new_vector(5.0, 6.0, 7.0);
 
         // Conceptually, this is just moving backward by the given vector
-        assert_eq!(p - v, SpatialTuple::new_point(-2.0, -4.0, -6.0));
+        assert_eq!(p - v, new_point(-2.0, -4.0, -6.0));
     }
 
     #[test]
     fn subtracting_two_vectors() {
-        let v1 = SpatialTuple::new_vector(3.0, 2.0, 1.0);
-        let v2 = SpatialTuple::new_vector(5.0, 6.0, 7.0);
+        let v1 = new_vector(3.0, 2.0, 1.0);
+        let v2 = new_vector(5.0, 6.0, 7.0);
 
         // This represents the change in direction between the two
-        assert_eq!(v1 - v2, SpatialTuple::new_vector(-2.0, -4.0, -6.0));
+        assert_eq!(v1 - v2, new_vector(-2.0, -4.0, -6.0));
     }
 
     #[test]
