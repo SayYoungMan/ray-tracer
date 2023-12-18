@@ -56,6 +56,32 @@ impl std::ops::Neg for SpatialTuple {
     }
 }
 
+impl std::ops::Mul<f64> for SpatialTuple {
+    type Output = Self;
+
+    fn mul(self, scalar: f64) -> Self::Output {
+        Self(
+            self.0 * scalar,
+            self.1 * scalar,
+            self.2 * scalar,
+            self.3 * scalar,
+        )
+    }
+}
+
+impl std::ops::Div<f64> for SpatialTuple {
+    type Output = Self;
+
+    fn div(self, scalar: f64) -> Self::Output {
+        Self(
+            self.0 / scalar,
+            self.1 / scalar,
+            self.2 / scalar,
+            self.3 / scalar,
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -114,5 +140,26 @@ mod tests {
         let a = SpatialTuple(1.0, -2.0, 3.0, -4.0);
 
         assert_eq!(-a, SpatialTuple(-1.0, 2.0, -3.0, 4.0));
+    }
+
+    #[test]
+    fn multiplying_tuple_by_scalar() {
+        let a = SpatialTuple(1.0, -2.0, 3.0, -4.0);
+
+        assert_eq!(a * 3.5, SpatialTuple(3.5, -7.0, 10.5, -14.0));
+    }
+
+    #[test]
+    fn multiplying_tuple_by_fraction() {
+        let a = SpatialTuple(1.0, -2.0, 3.0, -4.0);
+
+        assert_eq!(a * 0.5, SpatialTuple(0.5, -1.0, 1.5, -2.0));
+    }
+
+    #[test]
+    fn dividing_tuple_by_scalar() {
+        let a = SpatialTuple(1.0, -2.0, 3.0, -4.0);
+
+        assert_eq!(a / 2.0, SpatialTuple(0.5, -1.0, 1.5, -2.0));
     }
 }
