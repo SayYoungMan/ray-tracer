@@ -48,6 +48,14 @@ impl std::ops::Sub for SpatialTuple {
     }
 }
 
+impl std::ops::Neg for SpatialTuple {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        Self(-self.0, -self.1, -self.2, -self.3)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -99,5 +107,12 @@ mod tests {
 
         // This represents the change in direction between the two
         assert_eq!(v1 - v2, SpatialTuple::new_vector(-2.0, -4.0, -6.0));
+    }
+
+    #[test]
+    fn negating_tuple() {
+        let a = SpatialTuple(1.0, -2.0, 3.0, -4.0);
+
+        assert_eq!(-a, SpatialTuple(-1.0, 2.0, -3.0, 4.0));
     }
 }
