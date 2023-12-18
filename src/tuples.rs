@@ -15,6 +15,12 @@ impl SpatialTuple {
     fn magnitude(&self) -> f64 {
         (self.0.powi(2) + self.1.powi(2) + self.2.powi(2) + self.3.powi(2)).sqrt()
     }
+
+    fn normalize(self) -> Self {
+        let mag = self.magnitude();
+
+        self / mag
+    }
 }
 
 impl PartialEq for SpatialTuple {
@@ -183,5 +189,22 @@ mod tests {
 
         let v = new_vector(-1.0, -2.0, -3.0);
         assert_eq!(v.magnitude(), 14.0_f64.sqrt());
+    }
+
+    #[test]
+    fn normalizing_vectors() {
+        let v = new_vector(4.0, 0.0, 0.0);
+        assert_eq!(v.normalize(), new_vector(1.0, 0.0, 0.0));
+
+        let v = new_vector(1.0, 2.0, 3.0);
+        assert_eq!(v.normalize(), new_vector(0.26726, 0.53452, 0.80178));
+    }
+
+    #[test]
+    fn magnitude_of_normalized_vector() {
+        let v = new_vector(1.0, 2.0, 3.0);
+        let norm = v.normalize();
+
+        assert_eq!(norm.magnitude(), 1.0);
     }
 }
