@@ -21,6 +21,10 @@ impl SpatialTuple {
 
         self / mag
     }
+
+    fn dot(&self, other: &Self) -> f64 {
+        self.0 * other.0 + self.1 * other.1 + self.2 * other.2 + self.3 * other.3
+    }
 }
 
 impl PartialEq for SpatialTuple {
@@ -206,5 +210,13 @@ mod tests {
         let norm = v.normalize();
 
         assert_eq!(norm.magnitude(), 1.0);
+    }
+
+    #[test]
+    fn dot_product_of_two_tuples() {
+        let a = new_vector(1.0, 2.0, 3.0);
+        let b = new_vector(2.0, 3.0, 4.0);
+
+        assert_eq!(a.dot(&b), 20.0);
     }
 }
