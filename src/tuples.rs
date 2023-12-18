@@ -23,7 +23,33 @@ impl SpatialTuple {
     }
 
     fn dot(&self, other: &Self) -> f64 {
+        if !self.is_vector() || !other.is_vector() {
+            panic!(
+                "Dot product is only allowed on vectors: Self {}, Other {}",
+                self.3, other.3
+            );
+        }
+
         self.0 * other.0 + self.1 * other.1 + self.2 * other.2 + self.3 * other.3
+    }
+
+    fn cross(&self, other: &Self) -> Self {
+        if !self.is_vector() || !other.is_vector() {
+            panic!(
+                "Cross product is only allowed on vectors: Self {}, Other {}",
+                self.3, other.3
+            );
+        }
+
+        new_vector(
+            self.1 * other.2 - self.2 * other.1,
+            self.2 * other.0 - self.0 * other.2,
+            self.0 * other.1 - self.1 * other.0,
+        )
+    }
+
+    fn is_vector(&self) -> bool {
+        self.3 == 0.0
     }
 }
 
@@ -213,10 +239,19 @@ mod tests {
     }
 
     #[test]
-    fn dot_product_of_two_tuples() {
+    fn dot_product_of_two_vectors() {
         let a = new_vector(1.0, 2.0, 3.0);
         let b = new_vector(2.0, 3.0, 4.0);
 
         assert_eq!(a.dot(&b), 20.0);
+    }
+
+    #[test]
+    fn cross_product_of_two_vectors() {
+        let a = new_vector(1.0, 2.0, 3.0);
+        let b = new_vector(2.0, 3.0, 4.0);
+
+        assert_eq!(a.cross(&b), new_vector(-1.0, 2.0, -1.0));
+        assert_eq!(b.cross(&a), new_vector(1.0, -2.0, 1.0));
     }
 }
