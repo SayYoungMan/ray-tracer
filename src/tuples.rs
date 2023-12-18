@@ -11,6 +11,12 @@ pub fn new_vector(x: f64, y: f64, z: f64) -> SpatialTuple {
 #[derive(Debug)]
 pub struct SpatialTuple(f64, f64, f64, f64);
 
+impl SpatialTuple {
+    fn magnitude(&self) -> f64 {
+        (self.0.powi(2) + self.1.powi(2) + self.2.powi(2) + self.3.powi(2)).sqrt()
+    }
+}
+
 impl PartialEq for SpatialTuple {
     fn eq(&self, other: &Self) -> bool {
         (self.0 - other.0).abs() < EPSILON
@@ -159,5 +165,23 @@ mod tests {
         let a = SpatialTuple(1.0, -2.0, 3.0, -4.0);
 
         assert_eq!(a / 2.0, SpatialTuple(0.5, -1.0, 1.5, -2.0));
+    }
+
+    #[test]
+    fn computing_magnitude_of_vectors() {
+        let v = new_vector(1.0, 0.0, 0.0);
+        assert_eq!(v.magnitude(), 1.0);
+
+        let v = new_vector(0.0, 1.0, 0.0);
+        assert_eq!(v.magnitude(), 1.0);
+
+        let v = new_vector(0.0, 0.0, 1.0);
+        assert_eq!(v.magnitude(), 1.0);
+
+        let v = new_vector(1.0, 2.0, 3.0);
+        assert_eq!(v.magnitude(), 14.0_f64.sqrt());
+
+        let v = new_vector(-1.0, -2.0, -3.0);
+        assert_eq!(v.magnitude(), 14.0_f64.sqrt());
     }
 }
