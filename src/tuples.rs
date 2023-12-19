@@ -1,4 +1,4 @@
-const EPSILON: f64 = 1e-5;
+use crate::constants::EPSILON;
 
 pub fn new_point(x: f64, y: f64, z: f64) -> SpatialTuple {
     SpatialTuple(x, y, z, 1.0)
