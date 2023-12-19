@@ -1,7 +1,7 @@
 use crate::constants::EPSILON;
 
-#[derive(Debug)]
-pub struct Color(f64, f64, f64);
+#[derive(Debug, Clone, Copy)]
+pub struct Color(pub f64, pub f64, pub f64);
 
 impl PartialEq for Color {
     fn eq(&self, other: &Self) -> bool {

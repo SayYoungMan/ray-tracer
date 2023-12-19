@@ -1,6 +1,7 @@
 use projectile::tick_until_fallen;
 use tuples::{new_point, new_vector};
 
+mod canvas;
 mod color;
 mod constants;
 mod projectile;
