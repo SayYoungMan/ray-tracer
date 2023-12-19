@@ -4,8 +4,8 @@ use std::{fs::File, io};
 use crate::{color::Color, constants::MAX_COLOR_VALUE};
 
 pub struct Canvas {
-    width: usize,
-    height: usize,
+    pub width: usize,
+    pub height: usize,
     color_grid: Vec<Vec<Color>>,
 }
 
@@ -41,6 +41,13 @@ impl Canvas {
     }
 
     pub fn write_pixel(&mut self, x: usize, y: usize, color: Color) {
+        if x >= self.width || y >= self.height {
+            println!(
+                "Ignoring an attempt to write to pixel that is out of bound, x: {}, y: {}",
+                x, y
+            );
+            return;
+        }
         self.color_grid[y][x] = color;
     }
 
