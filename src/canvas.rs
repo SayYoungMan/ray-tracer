@@ -1,3 +1,6 @@
+use std::io::Write;
+use std::{fs::File, io};
+
 use crate::{color::Color, constants::MAX_COLOR_VALUE};
 
 pub struct Canvas {
@@ -84,7 +87,13 @@ impl Canvas {
 
         body
     }
-    pub fn to_ppm(self) {}
+    pub fn to_ppm(self, path: &str) -> io::Result<()> {
+        let mut file = File::create(path)?;
+
+        write!(file, "{}", self.construct_ppm())?;
+
+        Ok(())
+    }
 }
 
 fn clamp_and_scale_color_value(c: f64) -> u8 {
