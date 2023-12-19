@@ -8,21 +8,21 @@ pub fn new_vector(x: f64, y: f64, z: f64) -> SpatialTuple {
     SpatialTuple(x, y, z, 0.0)
 }
 
-#[derive(Debug)]
-pub struct SpatialTuple(f64, f64, f64, f64);
+#[derive(Debug, Clone, Copy)]
+pub struct SpatialTuple(pub f64, pub f64, pub f64, pub f64);
 
 impl SpatialTuple {
-    fn magnitude(&self) -> f64 {
+    pub fn magnitude(&self) -> f64 {
         (self.0.powi(2) + self.1.powi(2) + self.2.powi(2) + self.3.powi(2)).sqrt()
     }
 
-    fn normalize(self) -> Self {
+    pub fn normalize(self) -> Self {
         let mag = self.magnitude();
 
         self / mag
     }
 
-    fn dot(&self, other: &Self) -> f64 {
+    pub fn dot(&self, other: &Self) -> f64 {
         if !self.is_vector() || !other.is_vector() {
             panic!(
                 "Dot product is only allowed on vectors: Self {}, Other {}",
@@ -33,7 +33,7 @@ impl SpatialTuple {
         self.0 * other.0 + self.1 * other.1 + self.2 * other.2 + self.3 * other.3
     }
 
-    fn cross(&self, other: &Self) -> Self {
+    pub fn cross(&self, other: &Self) -> Self {
         if !self.is_vector() || !other.is_vector() {
             panic!(
                 "Cross product is only allowed on vectors: Self {}, Other {}",
@@ -48,7 +48,7 @@ impl SpatialTuple {
         )
     }
 
-    fn is_vector(&self) -> bool {
+    pub fn is_vector(&self) -> bool {
         self.3 == 0.0
     }
 }
@@ -66,6 +66,19 @@ impl std::ops::Add for SpatialTuple {
     type Output = Self;
 
     fn add(self, other: Self) -> Self::Output {
+        Self(
+            self.0 + other.0,
+            self.1 + other.1,
+            self.2 + other.2,
+            self.3 + other.3,
+        )
+    }
+}
+
+impl std::ops::Add<&SpatialTuple> for SpatialTuple {
+    type Output = Self;
+
+    fn add(self, other: &SpatialTuple) -> Self::Output {
         Self(
             self.0 + other.0,
             self.1 + other.1,
