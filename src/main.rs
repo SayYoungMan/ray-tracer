@@ -11,6 +11,7 @@ mod constants;
 mod matrices;
 mod projectile;
 mod rays;
+mod sphere;
 mod transformation;
 mod tuples;
 
