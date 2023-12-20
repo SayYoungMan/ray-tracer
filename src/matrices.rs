@@ -1,6 +1,6 @@
 use crate::{constants::EPSILON, tuples::SpatialTuple};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Matrix {
     rows: usize,
     cols: usize,
@@ -24,6 +24,19 @@ impl Matrix {
 
     pub fn at(&self, row: usize, col: usize) -> f64 {
         self.data[row][col]
+    }
+
+    pub fn identity() -> Self {
+        Matrix {
+            rows: 4,
+            cols: 4,
+            data: vec![
+                vec![1.0, 0.0, 0.0, 0.0],
+                vec![0.0, 1.0, 0.0, 0.0],
+                vec![0.0, 0.0, 1.0, 0.0],
+                vec![0.0, 0.0, 0.0, 1.0],
+            ],
+        }
     }
 }
 
@@ -49,6 +62,31 @@ impl std::ops::Mul<Matrix> for Matrix {
     type Output = Self;
 
     fn mul(self, other: Matrix) -> Self::Output {
+        if self.rows != other.cols {
+            panic!("The matrix dimensions should match to perform multiplication: self.rows: {}, other.cols: {}", self.rows, other.cols);
+        }
+
+        let mut data = Vec::new();
+        for i in 0..self.rows {
+            let mut row_vector = Vec::new();
+            for j in 0..other.cols {
+                let mut sum = 0.0;
+                for n in 0..self.rows {
+                    sum += self.at(i, n) * other.at(n, j);
+                }
+                row_vector.push(sum);
+            }
+            data.push(row_vector);
+        }
+
+        Matrix::from_vec(data)
+    }
+}
+
+impl std::ops::Mul<&Matrix> for Matrix {
+    type Output = Self;
+
+    fn mul(self, other: &Matrix) -> Self::Output {
         if self.rows != other.cols {
             panic!("The matrix dimensions should match to perform multiplication: self.rows: {}, other.cols: {}", self.rows, other.cols);
         }
@@ -220,5 +258,20 @@ mod tests {
         let expected = SpatialTuple(18.0, 24.0, 33.0, 1.0);
 
         assert_eq!(A * b, expected);
+    }
+
+    #[test]
+    fn multiplying_by_identity_matrix() {
+        let A = Matrix::from_vec(vec![
+            vec![0.0, 1.0, 2.0, 4.0],
+            vec![1.0, 2.0, 4.0, 8.0],
+            vec![2.0, 4.0, 8.0, 16.0],
+            vec![4.0, 8.0, 16.0, 32.0],
+        ]);
+        let a = SpatialTuple(1.0, 2.0, 3.0, 4.0);
+        let identity_matrix = Matrix::identity();
+
+        assert_eq!(A.clone() * &identity_matrix, A);
+        assert_eq!(identity_matrix * a, a);
     }
 }
