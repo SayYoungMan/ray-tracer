@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Matrix(Vec<Vec<f64>>);
 
 #[allow(dead_code)]
@@ -67,5 +67,43 @@ mod tests {
         assert_eq!(M.at(0, 0), -3.0);
         assert_eq!(M.at(1, 1), -2.0);
         assert_eq!(M.at(2, 2), 1.0);
+    }
+
+    #[test]
+    fn matrix_equality_with_indentical_matrices() {
+        let A = Matrix::from_vec(vec![
+            vec![1.0, 2.0, 3.0, 4.0],
+            vec![5.0, 6.0, 7.0, 8.0],
+            vec![9.0, 8.0, 7.0, 6.0],
+            vec![5.0, 4.0, 3.0, 2.0],
+        ]);
+
+        let B = Matrix::from_vec(vec![
+            vec![1.0, 2.0, 3.0, 4.0],
+            vec![5.0, 6.0, 7.0, 8.0],
+            vec![9.0, 8.0, 7.0, 6.0],
+            vec![5.0, 4.0, 3.0, 2.0],
+        ]);
+
+        assert_eq!(A, B);
+    }
+
+    #[test]
+    fn matrix_equality_with_different_matrices() {
+        let A = Matrix::from_vec(vec![
+            vec![1.0, 2.0, 3.0, 4.0],
+            vec![5.0, 6.0, 7.0, 8.0],
+            vec![9.0, 8.0, 7.0, 6.0],
+            vec![5.0, 4.0, 3.0, 2.0],
+        ]);
+
+        let B = Matrix::from_vec(vec![
+            vec![2.0, 3.0, 4.0, 5.0],
+            vec![6.0, 7.0, 8.0, 9.0],
+            vec![8.0, 7.0, 6.0, 5.0],
+            vec![4.0, 3.0, 2.0, 1.0],
+        ]);
+
+        assert_ne!(A, B);
     }
 }
