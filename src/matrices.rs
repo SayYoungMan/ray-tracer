@@ -43,6 +43,22 @@ impl Matrix {
         }
     }
 
+    pub fn determinant(&self) -> f64 {
+        if self.cols != 2 || self.rows != 2 {
+            panic!(
+                "Determinant method only supports 2x2 matrix, recieved: {:#?}",
+                self
+            );
+        }
+
+        let a = self.at(0, 0);
+        let b = self.at(0, 1);
+        let c = self.at(1, 0);
+        let d = self.at(1, 1);
+
+        a * d - b * c
+    }
+
     pub fn identity() -> Self {
         Matrix {
             rows: 4,
@@ -315,5 +331,12 @@ mod tests {
         let A = Matrix::identity().transpose();
 
         assert_eq!(A, Matrix::identity());
+    }
+
+    #[test]
+    fn calculating_determinant_of_2x2_matrix() {
+        let A = Matrix::from_vec(vec![vec![1.0, 5.0], vec![-3.0, 2.0]]);
+
+        assert_eq!(A.determinant(), 17.0);
     }
 }
