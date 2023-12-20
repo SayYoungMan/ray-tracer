@@ -26,6 +26,23 @@ impl Matrix {
         self.data[row][col]
     }
 
+    pub fn transpose(self) -> Self {
+        let mut data = Vec::new();
+        for j in 0..self.cols {
+            let mut row = Vec::new();
+            for i in 0..self.rows {
+                row.push(self.at(i, j));
+            }
+            data.push(row);
+        }
+
+        Matrix {
+            rows: self.rows,
+            cols: self.cols,
+            data,
+        }
+    }
+
     pub fn identity() -> Self {
         Matrix {
             rows: 4,
@@ -273,5 +290,30 @@ mod tests {
 
         assert_eq!(A.clone() * &identity_matrix, A);
         assert_eq!(identity_matrix * a, a);
+    }
+
+    #[test]
+    fn transposing_matrix() {
+        let A = Matrix::from_vec(vec![
+            vec![0.0, 9.0, 3.0, 0.0],
+            vec![9.0, 8.0, 0.0, 8.0],
+            vec![1.0, 8.0, 5.0, 3.0],
+            vec![0.0, 0.0, 5.0, 8.0],
+        ]);
+        let expected = Matrix::from_vec(vec![
+            vec![0.0, 9.0, 1.0, 0.0],
+            vec![9.0, 8.0, 8.0, 0.0],
+            vec![3.0, 0.0, 5.0, 5.0],
+            vec![0.0, 8.0, 3.0, 8.0],
+        ]);
+
+        assert_eq!(A.transpose(), expected);
+    }
+
+    #[test]
+    fn transposing_identity_matrix() {
+        let A = Matrix::identity().transpose();
+
+        assert_eq!(A, Matrix::identity());
     }
 }
