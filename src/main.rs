@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use canvas::Canvas;
 use projectile::{tick_until_fallen, Environment, Projectile};
 use tuples::{new_point, new_vector};
@@ -9,7 +11,7 @@ mod matrices;
 mod projectile;
 mod tuples;
 
-fn main() {
+fn main() -> Result<(), Box<dyn Error>> {
     let start = new_point(0.0, 1.0, 0.0);
     let velocity = new_vector(1.0, 1.8, 0.0).normalize() * 11.25;
     let mut p = Projectile {
@@ -25,5 +27,10 @@ fn main() {
 
     tick_until_fallen(&mut c, &e, &mut p);
 
-    c.to_ppm("output.ppm");
+    if let Err(err) = c.to_ppm("output.ppm") {
+        eprintln!("Error occurred while generating PPM file: {}", err);
+        return Err(err.into());
+    }
+
+    Ok(())
 }
