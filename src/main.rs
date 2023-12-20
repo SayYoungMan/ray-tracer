@@ -10,6 +10,7 @@ mod color;
 mod constants;
 mod matrices;
 mod projectile;
+mod rays;
 mod transformation;
 mod tuples;
 
