@@ -11,6 +11,7 @@ mod color;
 mod constants;
 mod matrices;
 mod projectile;
+mod transformation;
 mod tuples;
 
 fn draw_projectile() -> Result<(), Box<dyn Error>> {
