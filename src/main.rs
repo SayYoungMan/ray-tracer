@@ -13,31 +13,32 @@ mod matrices;
 mod projectile;
 mod tuples;
 
-// fn main() -> Result<(), Box<dyn Error>> {
-//     let start = new_point(0.0, 1.0, 0.0);
-//     let velocity = new_vector(1.0, 1.8, 0.0).normalize() * 11.25;
-//     let mut p = Projectile {
-//         position: start,
-//         velocity,
-//     };
+fn draw_projectile() -> Result<(), Box<dyn Error>> {
+    let start = new_point(0.0, 1.0, 0.0);
+    let velocity = new_vector(1.0, 1.8, 0.0).normalize() * 11.25;
+    let mut p = Projectile {
+        position: start,
+        velocity,
+    };
 
-//     let gravity = new_vector(0.0, -0.1, 0.0);
-//     let wind = new_vector(-0.01, 0.0, 0.0);
-//     let e = Environment { gravity, wind };
+    let gravity = new_vector(0.0, -0.1, 0.0);
+    let wind = new_vector(-0.01, 0.0, 0.0);
+    let e = Environment { gravity, wind };
 
-//     let mut c = Canvas::new(900, 550);
+    let mut c = Canvas::new(900, 550);
 
-//     tick_until_fallen(&mut c, &e, &mut p);
+    tick_until_fallen(&mut c, &e, &mut p);
 
-//     if let Err(err) = c.to_ppm("output.ppm") {
-//         eprintln!("Error occurred while generating PPM file: {}", err);
-//         return Err(err.into());
-//     }
+    if let Err(err) = c.to_ppm("output.ppm") {
+        eprintln!("Error occurred while generating PPM file: {}", err);
+        return Err(err.into());
+    }
 
-//     Ok(())
-// }
+    Ok(())
+}
 
-fn main() {
+#[allow(non_snake_case, unused)]
+fn matrix_experiments() -> Result<(), Box<dyn Error>> {
     // It stays as identity matrix (I * I.inverse() = I)
     println!("Inverse of identity: {:?}", Matrix::identity().inverse());
 
@@ -76,4 +77,11 @@ fn main() {
     let b = SpatialTuple(1.0, 2.0, 3.0, 1.0);
     // This doubles only the second element of the tuple
     println!("Second of identity matrix is 2: {:?}", A * b);
+
+    Ok(())
+}
+
+fn main() -> Result<(), Box<dyn Error>> {
+    // draw_projectile()
+    matrix_experiments()
 }
