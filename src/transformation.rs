@@ -55,6 +55,17 @@ pub fn rotation_z(r: f64) -> Matrix {
     Matrix::from_vec(data)
 }
 
+pub fn shearing(x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Matrix {
+    let data = vec![
+        vec![1.0, x_y, x_z, 0.0],
+        vec![y_x, 1.0, y_z, 0.0],
+        vec![z_x, z_y, 1.0, 0.0],
+        vec![0.0, 0.0, 0.0, 1.0],
+    ];
+
+    Matrix::from_vec(data)
+}
+
 #[cfg(test)]
 mod tests {
     use std::f64::consts::PI;
@@ -172,5 +183,44 @@ mod tests {
             new_point(-2.0_f64.sqrt() / 2.0, 2.0_f64.sqrt() / 2.0, 0.0)
         );
         assert_eq!(full_quarter * p, new_point(-1.0, 0.0, 0.0));
+    }
+
+    #[test]
+    fn sharing_transformation_moves_one_in_proportion_to_another() {
+        // x in proportion to y
+        let transform = shearing(1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+        let p = new_point(2.0, 3.0, 4.0);
+
+        assert_eq!(transform * p, new_point(5.0, 3.0, 4.0));
+
+        // x in proportion to z
+        let transform = shearing(0.0, 1.0, 0.0, 0.0, 0.0, 0.0);
+        let p = new_point(2.0, 3.0, 4.0);
+
+        assert_eq!(transform * p, new_point(6.0, 3.0, 4.0));
+
+        // y in proportion to x
+        let transform = shearing(0.0, 0.0, 1.0, 0.0, 0.0, 0.0);
+        let p = new_point(2.0, 3.0, 4.0);
+
+        assert_eq!(transform * p, new_point(2.0, 5.0, 4.0));
+
+        // y in proportion to z
+        let transform = shearing(0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+        let p = new_point(2.0, 3.0, 4.0);
+
+        assert_eq!(transform * p, new_point(2.0, 7.0, 4.0));
+
+        // z in proportion to x
+        let transform = shearing(0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+        let p = new_point(2.0, 3.0, 4.0);
+
+        assert_eq!(transform * p, new_point(2.0, 3.0, 6.0));
+
+        // z in proportion to y
+        let transform = shearing(0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+        let p = new_point(2.0, 3.0, 4.0);
+
+        assert_eq!(transform * p, new_point(2.0, 3.0, 7.0));
     }
 }
