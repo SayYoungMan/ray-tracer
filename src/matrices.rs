@@ -43,10 +43,10 @@ impl Matrix {
         }
     }
 
-    fn determinant(&self) -> f64 {
+    fn determinant_2x2(&self) -> f64 {
         if self.cols != 2 || self.rows != 2 {
             panic!(
-                "Determinant method only supports 2x2 matrix, recieved: {:#?}",
+                "Determinant_2x2 method only supports 2x2 matrix, recieved: {:#?}",
                 self
             );
         }
@@ -57,6 +57,20 @@ impl Matrix {
         let d = self.at(1, 1);
 
         a * d - b * c
+    }
+
+    pub fn determinant(&self) -> f64 {
+        if self.rows == 2 && self.cols == 2 {
+            return self.determinant_2x2();
+        }
+
+        let mut det = 0.0;
+
+        for j in 0..self.cols {
+            det += self.at(0, j) * self.cofactor(0, j);
+        }
+
+        det
     }
 
     fn submatrix(&self, row: usize, col: usize) -> Matrix {
@@ -81,13 +95,6 @@ impl Matrix {
     }
 
     fn minor(&self, row: usize, col: usize) -> f64 {
-        if self.cols != 3 || self.rows != 3 {
-            panic!(
-                "Minor method only supports 3x3 matrix, recieved: {:#?}",
-                self
-            );
-        }
-
         self.submatrix(row, col).determinant()
     }
 
@@ -373,10 +380,40 @@ mod tests {
     }
 
     #[test]
-    fn calculating_determinant_of_2x2_matrix() {
+    fn calculating_determinant_of_2x2() {
         let A = Matrix::from_vec(vec![vec![1.0, 5.0], vec![-3.0, 2.0]]);
 
         assert_eq!(A.determinant(), 17.0);
+    }
+
+    #[test]
+    fn calculating_determinant_of_3x3() {
+        let A = Matrix::from_vec(vec![
+            vec![1.0, 2.0, 6.0],
+            vec![-5.0, 8.0, -4.0],
+            vec![2.0, 6.0, 4.0],
+        ]);
+
+        assert_eq!(A.cofactor(0, 0), 56.0);
+        assert_eq!(A.cofactor(0, 1), 12.0);
+        assert_eq!(A.cofactor(0, 2), -46.0);
+        assert_eq!(A.determinant(), -196.0);
+    }
+
+    #[test]
+    fn calculating_determinant_of_4x4() {
+        let A = Matrix::from_vec(vec![
+            vec![-2.0, -8.0, 3.0, 5.0],
+            vec![-3.0, 1.0, 7.0, 3.0],
+            vec![1.0, 2.0, -9.0, 6.0],
+            vec![-6.0, 7.0, 7.0, -9.0],
+        ]);
+
+        assert_eq!(A.cofactor(0, 0), 690.0);
+        assert_eq!(A.cofactor(0, 1), 447.0);
+        assert_eq!(A.cofactor(0, 2), 210.0);
+        assert_eq!(A.cofactor(0, 3), 51.0);
+        assert_eq!(A.determinant(), -4071.0);
     }
 
     #[test]
