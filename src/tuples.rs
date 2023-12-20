@@ -1,4 +1,4 @@
-use crate::constants::EPSILON;
+use crate::{constants::EPSILON, transformation};
 
 pub fn new_point(x: f64, y: f64, z: f64) -> SpatialTuple {
     SpatialTuple(x, y, z, 1.0)
@@ -59,6 +59,30 @@ impl SpatialTuple {
 
     pub fn is_vector(&self) -> bool {
         self.3 == 0.0
+    }
+
+    pub fn translate(self, x: f64, y: f64, z: f64) -> Self {
+        transformation::translation(x, y, z) * self
+    }
+
+    pub fn scale(self, x: f64, y: f64, z: f64) -> Self {
+        transformation::scaling(x, y, z) * self
+    }
+
+    pub fn rotate_x(self, r: f64) -> Self {
+        transformation::rotation_x(r) * self
+    }
+
+    pub fn rotate_y(self, r: f64) -> Self {
+        transformation::rotation_y(r) * self
+    }
+
+    pub fn rotate_z(self, r: f64) -> Self {
+        transformation::rotation_z(r) * self
+    }
+
+    pub fn shear(self, x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Self {
+        transformation::shearing(x_y, x_z, y_x, y_z, z_x, z_y) * self
     }
 }
 
@@ -146,6 +170,8 @@ impl std::ops::Div<f64> for SpatialTuple {
 
 #[cfg(test)]
 mod tests {
+    use std::f64::consts::PI;
+
     use super::*;
 
     #[test]
@@ -275,5 +301,17 @@ mod tests {
 
         assert_eq!(a.cross(&b), new_vector(-1.0, 2.0, -1.0));
         assert_eq!(b.cross(&a), new_vector(1.0, -2.0, 1.0));
+    }
+
+    #[test]
+    fn chained_transformations() {
+        let p = new_point(1.0, 0.0, 1.0);
+
+        assert_eq!(
+            p.rotate_x(PI / 2.0)
+                .scale(5.0, 5.0, 5.0)
+                .translate(10.0, 5.0, 7.0),
+            new_point(15.0, 0.0, 7.0)
+        );
     }
 }
