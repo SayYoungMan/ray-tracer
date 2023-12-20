@@ -13,6 +13,14 @@ pub struct SpatialTuple(pub f64, pub f64, pub f64, pub f64);
 
 #[allow(dead_code)]
 impl SpatialTuple {
+    pub fn from_vec(vec: Vec<f64>) -> Self {
+        if vec.len() != 4 {
+            panic!("Invalid length of vector received: {:#?}", vec);
+        }
+
+        SpatialTuple(vec[0], vec[1], vec[2], vec[3])
+    }
+
     pub fn magnitude(&self) -> f64 {
         (self.0.powi(2) + self.1.powi(2) + self.2.powi(2) + self.3.powi(2)).sqrt()
     }
