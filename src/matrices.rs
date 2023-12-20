@@ -59,6 +59,27 @@ impl Matrix {
         a * d - b * c
     }
 
+    pub fn submatrix(&self, row: usize, col: usize) -> Matrix {
+        let mut data = Vec::new();
+        for i in 0..self.rows {
+            if i == row {
+                continue;
+            }
+
+            let mut tmp_row = Vec::new();
+            for j in 0..self.cols {
+                if j == col {
+                    continue;
+                }
+
+                tmp_row.push(self.at(i, j));
+            }
+            data.push(tmp_row);
+        }
+
+        Matrix::from_vec(data)
+    }
+
     pub fn identity() -> Self {
         Matrix {
             rows: 4,
@@ -338,5 +359,34 @@ mod tests {
         let A = Matrix::from_vec(vec![vec![1.0, 5.0], vec![-3.0, 2.0]]);
 
         assert_eq!(A.determinant(), 17.0);
+    }
+
+    #[test]
+    fn submatrix_of_3x3_is_2x2() {
+        let A = Matrix::from_vec(vec![
+            vec![1.0, 5.0, 0.0],
+            vec![-3.0, 2.0, 7.0],
+            vec![0.0, 6.0, -3.0],
+        ]);
+        let expected = Matrix::from_vec(vec![vec![-3.0, 2.0], vec![0.0, 6.0]]);
+
+        assert_eq!(A.submatrix(0, 2), expected);
+    }
+
+    #[test]
+    fn submatrix_of_4x4_is_3x3() {
+        let A = Matrix::from_vec(vec![
+            vec![-6.0, 1.0, 1.0, 6.0],
+            vec![-8.0, 5.0, 8.0, 6.0],
+            vec![-1.0, 0.0, 8.0, 2.0],
+            vec![-7.0, 1.0, -1.0, 1.0],
+        ]);
+        let expected = Matrix::from_vec(vec![
+            vec![-6.0, 1.0, 6.0],
+            vec![-8.0, 8.0, 6.0],
+            vec![-7.0, -1.0, 1.0],
+        ]);
+
+        assert_eq!(A.submatrix(2, 1), expected);
     }
 }
