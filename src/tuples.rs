@@ -11,6 +11,7 @@ pub fn new_vector(x: f64, y: f64, z: f64) -> SpatialTuple {
 #[derive(Debug, Clone, Copy)]
 pub struct SpatialTuple(pub f64, pub f64, pub f64, pub f64);
 
+#[allow(dead_code)]
 impl SpatialTuple {
     pub fn magnitude(&self) -> f64 {
         (self.0.powi(2) + self.1.powi(2) + self.2.powi(2) + self.3.powi(2)).sqrt()
