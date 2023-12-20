@@ -80,6 +80,17 @@ impl Matrix {
         Matrix::from_vec(data)
     }
 
+    pub fn minor(&self, row: usize, col: usize) -> f64 {
+        if self.cols != 3 || self.rows != 3 {
+            panic!(
+                "Minor method only supports 3x3 matrix, recieved: {:#?}",
+                self
+            );
+        }
+
+        self.submatrix(row, col).determinant()
+    }
+
     pub fn identity() -> Self {
         Matrix {
             rows: 4,
@@ -388,5 +399,18 @@ mod tests {
         ]);
 
         assert_eq!(A.submatrix(2, 1), expected);
+    }
+
+    #[test]
+    fn calculating_minor_of_3x3() {
+        let A = Matrix::from_vec(vec![
+            vec![3.0, 5.0, 0.0],
+            vec![2.0, -1.0, -7.0],
+            vec![6.0, -1.0, 5.0],
+        ]);
+        let B = A.submatrix(1, 0);
+
+        assert_eq!(B.determinant(), 25.0);
+        assert_eq!(A.minor(1, 0), 25.0);
     }
 }
