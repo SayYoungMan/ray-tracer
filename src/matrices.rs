@@ -1,6 +1,6 @@
-use crate::tuples::SpatialTuple;
+use crate::{constants::EPSILON, tuples::SpatialTuple};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct Matrix {
     rows: usize,
     cols: usize,
@@ -24,6 +24,24 @@ impl Matrix {
 
     pub fn at(&self, row: usize, col: usize) -> f64 {
         self.data[row][col]
+    }
+}
+
+impl PartialEq for Matrix {
+    fn eq(&self, other: &Self) -> bool {
+        if self.cols != other.cols || self.rows != other.rows {
+            return false;
+        }
+
+        for i in 0..self.rows {
+            for j in 0..self.cols {
+                if (self.at(i, j) - other.at(i, j)) > EPSILON {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }
 
