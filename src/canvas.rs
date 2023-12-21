@@ -9,7 +9,6 @@ pub struct Canvas {
     color_grid: Vec<Vec<Color>>,
 }
 
-#[allow(dead_code)]
 impl Canvas {
     pub fn new(width: usize, height: usize) -> Canvas {
         let mut color_matrix = Vec::with_capacity(height);

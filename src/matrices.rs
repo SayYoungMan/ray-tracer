@@ -9,7 +9,6 @@ pub struct Matrix {
     data: Vec<Vec<f64>>,
 }
 
-#[allow(dead_code)]
 impl Matrix {
     pub fn from_vec(data: Vec<Vec<f64>>) -> Self {
         let rows = data.len();

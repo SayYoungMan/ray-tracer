@@ -11,7 +11,6 @@ pub fn new_vector(x: f64, y: f64, z: f64) -> SpatialTuple {
 #[derive(Debug, Clone, Copy)]
 pub struct SpatialTuple(pub f64, pub f64, pub f64, pub f64);
 
-#[allow(dead_code)]
 impl SpatialTuple {
     pub fn from_vec(vec: Vec<f64>) -> Self {
         if vec.len() != 4 {
