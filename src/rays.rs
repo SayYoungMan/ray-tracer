@@ -1,8 +1,8 @@
 use crate::{sphere::Sphere, tuples::SpatialTuple};
 
 pub struct Ray {
-    origin: SpatialTuple,
-    direction: SpatialTuple,
+    pub origin: SpatialTuple,
+    pub direction: SpatialTuple,
 }
 
 impl Ray {
@@ -16,26 +16,6 @@ impl Ray {
 
     pub fn position(&self, t: f64) -> SpatialTuple {
         self.origin + self.direction * t
-    }
-
-    pub fn intersect_sphere(&self, sphere: Sphere) -> Option<(f64, f64)> {
-        // Vector from the sphere's center to the ray origin
-        let sphere_to_ray = self.origin - sphere.center;
-
-        let a = self.direction.dot(&self.direction);
-        let b = 2.0 * self.direction.dot(&sphere_to_ray);
-        let c = sphere_to_ray.dot(&sphere_to_ray) - sphere.radius.powi(2);
-
-        let discriminant = b.powi(2) - 4.0 * a * c;
-
-        if discriminant < 0.0 {
-            return None;
-        }
-
-        let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
-        let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
-
-        Some((t1, t2))
     }
 }
 
@@ -67,59 +47,5 @@ mod tests {
         assert_eq!(r.position(1.0), new_point(3.0, 3.0, 4.0));
         assert_eq!(r.position(-1.0), new_point(1.0, 3.0, 4.0));
         assert_eq!(r.position(2.5), new_point(4.5, 3.0, 4.0));
-    }
-
-    #[test]
-    fn ray_intersects_sphere_at_two_points() {
-        let r = Ray::new(new_point(0.0, 0.0, -5.0), new_vector(0.0, 0.0, 1.0));
-        let s = Sphere::origin_unit_sphere();
-
-        let xs = r.intersect_sphere(s).unwrap();
-
-        assert_eq!(xs.0, 4.0);
-        assert_eq!(xs.1, 6.0);
-    }
-
-    #[test]
-    fn ray_intersects_sphere_at_tangent() {
-        let r = Ray::new(new_point(0.0, 1.0, -5.0), new_vector(0.0, 0.0, 1.0));
-        let s = Sphere::origin_unit_sphere();
-
-        let xs = r.intersect_sphere(s).unwrap();
-
-        assert_eq!(xs.0, 5.0);
-        assert_eq!(xs.1, 5.0);
-    }
-
-    #[test]
-    fn ray_misses_sphere() {
-        let r = Ray::new(new_point(0.0, 2.0, -5.0), new_vector(0.0, 0.0, 1.0));
-        let s = Sphere::origin_unit_sphere();
-
-        let xs = r.intersect_sphere(s);
-
-        assert!(xs.is_none());
-    }
-
-    #[test]
-    fn ray_originates_inside_sphere() {
-        let r = Ray::new(new_point(0.0, 0.0, 0.0), new_vector(0.0, 0.0, 1.0));
-        let s = Sphere::origin_unit_sphere();
-
-        let xs = r.intersect_sphere(s).unwrap();
-
-        assert_eq!(xs.0, -1.0);
-        assert_eq!(xs.1, 1.0);
-    }
-
-    #[test]
-    fn sphere_behind_ray() {
-        let r = Ray::new(new_point(0.0, 0.0, 5.0), new_vector(0.0, 0.0, 1.0));
-        let s = Sphere::origin_unit_sphere();
-
-        let xs = r.intersect_sphere(s).unwrap();
-
-        assert_eq!(xs.0, -6.0);
-        assert_eq!(xs.1, -4.0);
     }
 }

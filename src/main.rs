@@ -8,6 +8,7 @@ mod canvas;
 mod clock;
 mod color;
 mod constants;
+mod intersection;
 mod matrices;
 mod projectile;
 mod rays;
