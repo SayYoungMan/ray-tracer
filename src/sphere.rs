@@ -3,6 +3,7 @@ use uuid::Uuid;
 use crate::{
     intersection::Intersection,
     rays::Ray,
+    transformation::Transformation,
     tuples::{new_point, SpatialTuple},
 };
 
@@ -11,6 +12,7 @@ pub struct Sphere {
     id: Uuid,
     pub center: SpatialTuple,
     pub radius: f64,
+    pub transformations: Vec<Transformation>,
 }
 
 impl Sphere {
@@ -19,6 +21,7 @@ impl Sphere {
             id: Uuid::new_v4(),
             center,
             radius,
+            transformations: Vec::new(),
         }
     }
 
@@ -27,13 +30,18 @@ impl Sphere {
     }
 
     pub fn intersect(&self, ray: Ray) -> Vec<Intersection> {
+        let mut new_ray = ray;
+        for t in &self.transformations {
+            new_ray = new_ray.transform(*t);
+        }
+
         let vec = Vec::new();
 
         // Vector from the sphere's center to the ray origin
-        let sphere_to_ray = ray.origin - self.center;
+        let sphere_to_ray = new_ray.origin - self.center;
 
-        let a = ray.direction.dot(&ray.direction);
-        let b = 2.0 * ray.direction.dot(&sphere_to_ray);
+        let a = new_ray.direction.dot(&new_ray.direction);
+        let b = 2.0 * new_ray.direction.dot(&sphere_to_ray);
         let c = sphere_to_ray.dot(&sphere_to_ray) - self.radius.powi(2);
 
         let discriminant = b.powi(2) - 4.0 * a * c;
@@ -46,6 +54,10 @@ impl Sphere {
         let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
 
         vec![Intersection::new(t1, &self), Intersection::new(t2, &self)]
+    }
+
+    pub fn set_transformation(&mut self, m: Vec<Transformation>) {
+        self.transformations = m;
     }
 }
 
@@ -126,5 +138,43 @@ mod tests {
         assert_eq!(xs.len(), 2);
         assert_eq!(xs[0].object, &s);
         assert_eq!(xs[1].object, &s);
+    }
+
+    #[test]
+    fn changing_sphere_transformation() {
+        let mut s = Sphere::origin_unit_sphere();
+
+        assert_eq!(s.transformations.len(), 0);
+
+        let t = Transformation::Translation(2.0, 3.0, 4.0);
+
+        s.set_transformation(vec![t]);
+
+        assert_eq!(s.transformations.len(), 1);
+        assert_eq!(s.transformations[0], t);
+    }
+
+    #[test]
+    fn intersecting_scaled_sphere() {
+        let r = Ray::new(new_point(0.0, 0.0, -5.0), new_vector(0.0, 0.0, 1.0));
+        let mut s = Sphere::origin_unit_sphere();
+
+        s.set_transformation(vec![Transformation::Scaling(2.0, 2.0, 2.0)]);
+        let xs = s.intersect(r);
+
+        assert_eq!(xs.len(), 2);
+        assert_eq!(xs[0].t, 3.0);
+        assert_eq!(xs[1].t, 7.0);
+    }
+
+    #[test]
+    fn intersecting_translated_sphere() {
+        let r = Ray::new(new_point(0.0, 0.0, -5.0), new_vector(0.0, 0.0, 1.0));
+        let mut s = Sphere::origin_unit_sphere();
+
+        s.set_transformation(vec![Transformation::Translation(5.0, 0.0, 0.0)]);
+        let xs = s.intersect(r);
+
+        assert_eq!(xs.len(), 0);
     }
 }

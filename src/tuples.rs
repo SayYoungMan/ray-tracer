@@ -1,4 +1,7 @@
-use crate::{constants::EPSILON, transformation};
+use crate::{
+    constants::EPSILON,
+    transformation::{self, Transformation},
+};
 
 pub fn new_point(x: f64, y: f64, z: f64) -> SpatialTuple {
     SpatialTuple(x, y, z, 1.0)
@@ -61,27 +64,54 @@ impl SpatialTuple {
     }
 
     pub fn translate(self, x: f64, y: f64, z: f64) -> Self {
-        transformation::translation(x, y, z) * self
+        Transformation::Translation(x, y, z).matrix() * self
+    }
+
+    pub fn inverse_translate(self, x: f64, y: f64, z: f64) -> Self {
+        Transformation::Translation(x, y, z).matrix().inverse() * self
     }
 
     pub fn scale(self, x: f64, y: f64, z: f64) -> Self {
-        transformation::scaling(x, y, z) * self
+        Transformation::Scaling(x, y, z).matrix() * self
+    }
+
+    pub fn inverse_scale(self, x: f64, y: f64, z: f64) -> Self {
+        Transformation::Scaling(x, y, z).matrix().inverse() * self
     }
 
     pub fn rotate_x(self, r: f64) -> Self {
-        transformation::rotation_x(r) * self
+        Transformation::RotationX(r).matrix() * self
+    }
+
+    pub fn inverse_rotate_x(self, r: f64) -> Self {
+        Transformation::RotationX(r).matrix().inverse() * self
     }
 
     pub fn rotate_y(self, r: f64) -> Self {
-        transformation::rotation_y(r) * self
+        Transformation::RotationY(r).matrix() * self
+    }
+
+    pub fn inverse_rotate_y(self, r: f64) -> Self {
+        Transformation::RotationY(r).matrix().inverse() * self
     }
 
     pub fn rotate_z(self, r: f64) -> Self {
-        transformation::rotation_z(r) * self
+        Transformation::RotationZ(r).matrix() * self
+    }
+
+    pub fn inverse_rotate_z(self, r: f64) -> Self {
+        Transformation::RotationZ(r).matrix().inverse() * self
     }
 
     pub fn shear(self, x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Self {
-        transformation::shearing(x_y, x_z, y_x, y_z, z_x, z_y) * self
+        Transformation::Shearing(x_y, x_z, y_x, y_z, z_x, z_y).matrix() * self
+    }
+
+    pub fn inverse_shear(self, x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Self {
+        Transformation::Shearing(x_y, x_z, y_x, y_z, z_x, z_y)
+            .matrix()
+            .inverse()
+            * self
     }
 }
 
