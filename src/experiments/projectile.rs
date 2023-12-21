@@ -48,7 +48,7 @@ pub fn draw_projectile() -> Result<(), Box<dyn Error>> {
 
     tick_until_fallen(&mut c, &e, &mut p);
 
-    c.to_ppm("output.ppm")?;
+    c.to_ppm("projectile.ppm")?;
 
     Ok(())
 }
