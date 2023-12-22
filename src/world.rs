@@ -17,7 +17,7 @@ impl World {
     pub fn new() -> Self {
         Self {
             objects: Vec::new(),
-            light: PointLight::new(Point::new(0.0, 0.0, 0.0), Color(0.0, 0.0, 0.0)),
+            light: PointLight::new(Point::origin(), Color(0.0, 0.0, 0.0)),
         }
     }
 
@@ -117,7 +117,7 @@ mod tests {
     fn shading_intersection_from_inside() {
         let mut w = World::default();
         w.light = PointLight::new(Point::new(0.0, 0.25, 0.0), Color(1.0, 1.0, 1.0));
-        let r = Ray::new(Point::new(0.0, 0.0, 0.0), Vector::new(0.0, 0.0, 1.0));
+        let r = Ray::new(Point::origin(), Vector::new(0.0, 0.0, 1.0));
         let shape = &w.objects[1];
         let i = Intersection {
             t: 0.5,

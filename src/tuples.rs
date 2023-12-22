@@ -268,6 +268,10 @@ impl Point {
         Point(x, y, z, 1.0)
     }
 
+    pub fn origin() -> Self {
+        Point::new(0.0, 0.0, 0.0)
+    }
+
     pub fn from_vec(vec: Vec<f64>) -> Self {
         if vec.len() != 4 {
             panic!("Invalid length of vector received: {:?}", vec);

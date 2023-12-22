@@ -22,7 +22,7 @@ mod tests {
     #[test]
     fn point_light_has_position_and_intensity() {
         let intensity = Color(1.0, 1.0, 1.0);
-        let position = Point::new(0.0, 0.0, 0.0);
+        let position = Point::origin();
 
         let light = PointLight::new(position, intensity);
 

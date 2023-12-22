@@ -32,7 +32,7 @@ impl Sphere {
         }
 
         // Vector from the sphere's center to the ray origin
-        let sphere_to_ray = new_ray.origin - Point::new(0.0, 0.0, 0.0);
+        let sphere_to_ray = new_ray.origin - Point::origin();
 
         let a = new_ray.direction.dot(&new_ray.direction);
         let b = 2.0 * new_ray.direction.dot(&sphere_to_ray);
@@ -56,10 +56,10 @@ impl Sphere {
 
     pub fn normal_at(&self, p: Point) -> Vector {
         let mut point = p;
-        let mut normal = (p - Point::new(0.0, 0.0, 0.0)).normalize();
+        let mut normal = (p - Point::origin()).normalize();
         for t in self.transformations.iter().rev() {
             point = t.matrix().inverse() * point;
-            let object_normal = point - Point::new(0.0, 0.0, 0.0);
+            let object_normal = point - Point::origin();
 
             normal = t.matrix().inverse().transpose() * object_normal;
             normal.3 = 0.0;
@@ -113,7 +113,7 @@ mod tests {
 
     #[test]
     fn ray_originates_inside_sphere() {
-        let r = Ray::new(Point::new(0.0, 0.0, 0.0), Vector::new(0.0, 0.0, 1.0));
+        let r = Ray::new(Point::origin(), Vector::new(0.0, 0.0, 1.0));
         let s = Sphere::new();
 
         let xs = s.intersect(r);
