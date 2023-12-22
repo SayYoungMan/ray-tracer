@@ -1,12 +1,12 @@
 use crate::{color::Color, tuples::SpatialTuple};
 
 pub struct PointLight {
-    position: SpatialTuple,
-    intensity: Color,
+    pub position: SpatialTuple,
+    pub intensity: Color,
 }
 
 impl PointLight {
-    fn new(position: SpatialTuple, intensity: Color) -> Self {
+    pub fn new(position: SpatialTuple, intensity: Color) -> Self {
         PointLight {
             position,
             intensity,

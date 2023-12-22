@@ -3,6 +3,12 @@ use crate::constants::EPSILON;
 #[derive(Debug, Clone, Copy)]
 pub struct Color(pub f64, pub f64, pub f64);
 
+impl Color {
+    pub fn black() -> Self {
+        Color(0.0, 0.0, 0.0)
+    }
+}
+
 impl PartialEq for Color {
     fn eq(&self, other: &Self) -> bool {
         (self.0 - other.0).abs() < EPSILON
