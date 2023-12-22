@@ -15,7 +15,7 @@ pub fn draw_circle() -> Result<(), Box<dyn Error>> {
 
     let mut canvas = Canvas::new(CANVAS_PIXELS, CANVAS_PIXELS);
     let red = Color(1.0, 0.0, 0.0);
-    let sphere = Sphere::origin_unit_sphere();
+    let sphere = Sphere::new();
 
     // For each row of pixels in the canvas
     for y in 0..canvas.height {

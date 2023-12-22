@@ -24,12 +24,12 @@ impl World {
     pub fn default() -> Self {
         let light = PointLight::new(Point::new(-10.0, 10.0, -10.0), Color(1.0, 1.0, 1.0));
 
-        let mut s1 = Sphere::origin_unit_sphere();
+        let mut s1 = Sphere::new();
         s1.material.color = Color(0.8, 1.0, 0.6);
         s1.material.diffuse = 0.7;
         s1.material.specular = 0.2;
 
-        let mut s2 = Sphere::origin_unit_sphere();
+        let mut s2 = Sphere::new();
         s2.set_transformation(vec![Transformation::Scaling(0.5, 0.5, 0.5)]);
 
         Self {

@@ -12,25 +12,17 @@ use crate::{
 #[derive(Debug, PartialEq)]
 pub struct Sphere {
     id: Uuid,
-    pub center: Point,
-    pub radius: f64,
     pub transformations: Vec<Transformation>,
     pub material: Material,
 }
 
 impl Sphere {
-    pub fn new(center: Point, radius: f64) -> Self {
+    pub fn new() -> Self {
         Sphere {
             id: Uuid::new_v4(),
-            center,
-            radius,
             transformations: Vec::new(),
             material: Material::default(),
         }
-    }
-
-    pub fn origin_unit_sphere() -> Self {
-        Sphere::new(Point::new(0.0, 0.0, 0.0), 1.0)
     }
 
     pub fn intersect(&self, ray: Ray) -> Vec<Intersection> {
@@ -40,11 +32,11 @@ impl Sphere {
         }
 
         // Vector from the sphere's center to the ray origin
-        let sphere_to_ray = new_ray.origin - self.center;
+        let sphere_to_ray = new_ray.origin - Point::new(0.0, 0.0, 0.0);
 
         let a = new_ray.direction.dot(&new_ray.direction);
         let b = 2.0 * new_ray.direction.dot(&sphere_to_ray);
-        let c = sphere_to_ray.dot(&sphere_to_ray) - self.radius.powi(2);
+        let c = sphere_to_ray.dot(&sphere_to_ray) - 1.0;
 
         let discriminant = b.powi(2) - 4.0 * a * c;
 
@@ -64,10 +56,10 @@ impl Sphere {
 
     pub fn normal_at(&self, p: Point) -> Vector {
         let mut point = p;
-        let mut normal = (p - self.center).normalize();
+        let mut normal = (p - Point::new(0.0, 0.0, 0.0)).normalize();
         for t in self.transformations.iter().rev() {
             point = t.matrix().inverse() * point;
-            let object_normal = point - self.center;
+            let object_normal = point - Point::new(0.0, 0.0, 0.0);
 
             normal = t.matrix().inverse().transpose() * object_normal;
             normal.3 = 0.0;
@@ -88,7 +80,7 @@ mod tests {
     #[test]
     fn ray_intersects_sphere_at_two_points() {
         let r = Ray::new(Point::new(0.0, 0.0, -5.0), Vector::new(0.0, 0.0, 1.0));
-        let s = Sphere::origin_unit_sphere();
+        let s = Sphere::new();
 
         let xs = s.intersect(r);
 
@@ -100,7 +92,7 @@ mod tests {
     #[test]
     fn ray_intersects_sphere_at_tangent() {
         let r = Ray::new(Point::new(0.0, 1.0, -5.0), Vector::new(0.0, 0.0, 1.0));
-        let s = Sphere::origin_unit_sphere();
+        let s = Sphere::new();
 
         let xs = s.intersect(r);
 
@@ -112,7 +104,7 @@ mod tests {
     #[test]
     fn ray_misses_sphere() {
         let r = Ray::new(Point::new(0.0, 2.0, -5.0), Vector::new(0.0, 0.0, 1.0));
-        let s = Sphere::origin_unit_sphere();
+        let s = Sphere::new();
 
         let xs = s.intersect(r);
 
@@ -122,7 +114,7 @@ mod tests {
     #[test]
     fn ray_originates_inside_sphere() {
         let r = Ray::new(Point::new(0.0, 0.0, 0.0), Vector::new(0.0, 0.0, 1.0));
-        let s = Sphere::origin_unit_sphere();
+        let s = Sphere::new();
 
         let xs = s.intersect(r);
 
@@ -134,7 +126,7 @@ mod tests {
     #[test]
     fn sphere_behind_ray() {
         let r = Ray::new(Point::new(0.0, 0.0, 5.0), Vector::new(0.0, 0.0, 1.0));
-        let s = Sphere::origin_unit_sphere();
+        let s = Sphere::new();
 
         let xs = s.intersect(r);
 
@@ -146,7 +138,7 @@ mod tests {
     #[test]
     fn intersect_sets_object_on_intersection() {
         let r = Ray::new(Point::new(0.0, 0.0, 5.0), Vector::new(0.0, 0.0, 1.0));
-        let s = Sphere::origin_unit_sphere();
+        let s = Sphere::new();
 
         let xs = s.intersect(r);
 
@@ -157,7 +149,7 @@ mod tests {
 
     #[test]
     fn changing_sphere_transformation() {
-        let mut s = Sphere::origin_unit_sphere();
+        let mut s = Sphere::new();
 
         assert_eq!(s.transformations.len(), 0);
 
@@ -172,7 +164,7 @@ mod tests {
     #[test]
     fn intersecting_scaled_sphere() {
         let r = Ray::new(Point::new(0.0, 0.0, -5.0), Vector::new(0.0, 0.0, 1.0));
-        let mut s = Sphere::origin_unit_sphere();
+        let mut s = Sphere::new();
 
         s.set_transformation(vec![Transformation::Scaling(2.0, 2.0, 2.0)]);
         let xs = s.intersect(r);
@@ -185,7 +177,7 @@ mod tests {
     #[test]
     fn intersecting_translated_sphere() {
         let r = Ray::new(Point::new(0.0, 0.0, -5.0), Vector::new(0.0, 0.0, 1.0));
-        let mut s = Sphere::origin_unit_sphere();
+        let mut s = Sphere::new();
 
         s.set_transformation(vec![Transformation::Translation(5.0, 0.0, 0.0)]);
         let xs = s.intersect(r);
@@ -195,7 +187,7 @@ mod tests {
 
     #[test]
     fn the_normal_on_sphere() {
-        let s = Sphere::origin_unit_sphere();
+        let s = Sphere::new();
 
         // On the x-axis
         let n = s.normal_at(Point::new(1.0, 0.0, 0.0));
@@ -227,7 +219,7 @@ mod tests {
 
     #[test]
     fn normal_is_normalized_vector() {
-        let s = Sphere::origin_unit_sphere();
+        let s = Sphere::new();
 
         let n = s.normal_at(Point::new(
             3.0_f64.sqrt() / 3.0,
@@ -240,7 +232,7 @@ mod tests {
 
     #[test]
     fn computing_normal_on_translated_sphere() {
-        let mut s = Sphere::origin_unit_sphere();
+        let mut s = Sphere::new();
         s.set_transformation(vec![Transformation::Translation(0.0, 1.0, 0.0)]);
 
         let n = s.normal_at(Point::new(0.0, 1.70711, -0.70711));
@@ -250,7 +242,7 @@ mod tests {
 
     #[test]
     fn computing_normal_on_transformed_sphere() {
-        let mut s = Sphere::origin_unit_sphere();
+        let mut s = Sphere::new();
         let m = vec![
             Transformation::Scaling(1.0, 0.5, 1.0),
             Transformation::RotationZ(PI / 0.5),
@@ -264,7 +256,7 @@ mod tests {
 
     #[test]
     fn sphere_has_default_material() {
-        let s = Sphere::origin_unit_sphere();
+        let s = Sphere::new();
 
         assert_eq!(s.material, Material::default());
     }

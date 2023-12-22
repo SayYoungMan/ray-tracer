@@ -63,7 +63,7 @@ mod tests {
 
     #[test]
     fn intersection_encapsulates_t_and_object() {
-        let s = Sphere::origin_unit_sphere();
+        let s = Sphere::new();
         let i = Intersection::new(3.5, &s);
 
         assert_eq!(i.t, 3.5);
@@ -72,7 +72,7 @@ mod tests {
 
     #[test]
     fn hit_when_all_intersections_positive_t() {
-        let s = Sphere::origin_unit_sphere();
+        let s = Sphere::new();
         let i1 = Intersection::new(1.0, &s);
         let i2 = Intersection::new(2.0, &s);
         let xs = vec![i1, i2];
@@ -84,7 +84,7 @@ mod tests {
 
     #[test]
     fn hit_when_some_intersections_negative_t() {
-        let s = Sphere::origin_unit_sphere();
+        let s = Sphere::new();
         let i1 = Intersection::new(-1.0, &s);
         let i2 = Intersection::new(1.0, &s);
         let xs = vec![i1, i2];
@@ -96,7 +96,7 @@ mod tests {
 
     #[test]
     fn hit_when_all_intersections_negative_t() {
-        let s = Sphere::origin_unit_sphere();
+        let s = Sphere::new();
         let i1 = Intersection::new(-2.0, &s);
         let i2 = Intersection::new(-1.0, &s);
         let xs = vec![i1, i2];
@@ -108,7 +108,7 @@ mod tests {
 
     #[test]
     fn hit_is_the_lowest_nonnegative_intersection() {
-        let s = Sphere::origin_unit_sphere();
+        let s = Sphere::new();
         let i1 = Intersection::new(5.0, &s);
         let i2 = Intersection::new(7.0, &s);
         let i3 = Intersection::new(-3.0, &s);
@@ -123,7 +123,7 @@ mod tests {
     #[test]
     fn precomputing_state_of_intersection() {
         let r = Ray::new(Point::new(0.0, 0.0, -5.0), Vector::new(0.0, 0.0, 1.0));
-        let shape = Sphere::origin_unit_sphere();
+        let shape = Sphere::new();
         let i = Intersection {
             t: 4.0,
             object: &shape,
@@ -141,7 +141,7 @@ mod tests {
     #[test]
     fn hit_when_intersection_occurs_outside() {
         let r = Ray::new(Point::new(0.0, 0.0, -5.0), Vector::new(0.0, 0.0, 1.0));
-        let shape = Sphere::origin_unit_sphere();
+        let shape = Sphere::new();
         let i = Intersection {
             t: 4.0,
             object: &shape,
@@ -155,7 +155,7 @@ mod tests {
     #[test]
     fn hit_when_intersection_occurs_inside() {
         let r = Ray::new(Point::new(0.0, 0.0, 0.0), Vector::new(0.0, 0.0, 1.0));
-        let shape = Sphere::origin_unit_sphere();
+        let shape = Sphere::new();
         let i = Intersection {
             t: 1.0,
             object: &shape,
