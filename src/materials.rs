@@ -6,11 +6,11 @@ use crate::{
 
 #[derive(Debug, PartialEq)]
 pub struct Material {
-    color: Color,
-    ambient: f64,
-    diffuse: f64,
-    specular: f64,
-    shininess: f64,
+    pub color: Color,
+    pub ambient: f64,
+    pub diffuse: f64,
+    pub specular: f64,
+    pub shininess: f64,
 }
 
 impl Material {
@@ -30,7 +30,7 @@ impl Material {
 
     pub fn lighting(
         &self,
-        light: PointLight,
+        light: &PointLight,
         point: Point,
         eyev: Vector,
         normalv: Vector,
@@ -110,7 +110,7 @@ mod tests {
             let normalv = Vector::new(0.0, 0.0, -1.0);
             let light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color(1.0, 1.0, 1.0));
 
-            let result = M.lighting(light, POSITION, eyev, normalv);
+            let result = M.lighting(&light, POSITION, eyev, normalv);
 
             assert_eq!(result, Color(1.9, 1.9, 1.9));
         }
@@ -123,7 +123,7 @@ mod tests {
             let normalv = Vector::new(0.0, 0.0, -1.0);
             let light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color(1.0, 1.0, 1.0));
 
-            let result = M.lighting(light, POSITION, eyev, normalv);
+            let result = M.lighting(&light, POSITION, eyev, normalv);
 
             assert_eq!(result, Color(1.0, 1.0, 1.0));
         }
@@ -136,7 +136,7 @@ mod tests {
             let normalv = Vector::new(0.0, 0.0, -1.0);
             let light = PointLight::new(Point::new(0.0, 10.0, -10.0), Color(1.0, 1.0, 1.0));
 
-            let result = M.lighting(light, POSITION, eyev, normalv);
+            let result = M.lighting(&light, POSITION, eyev, normalv);
 
             assert_eq!(result, Color(0.7364, 0.7364, 0.7364));
         }
@@ -148,7 +148,7 @@ mod tests {
             let normalv = Vector::new(0.0, 0.0, -1.0);
             let light = PointLight::new(Point::new(0.0, 10.0, -10.0), Color(1.0, 1.0, 1.0));
 
-            let result = M.lighting(light, POSITION, eyev, normalv);
+            let result = M.lighting(&light, POSITION, eyev, normalv);
 
             assert_eq!(result, Color(1.6364, 1.6364, 1.6364));
         }
@@ -160,7 +160,7 @@ mod tests {
             let normalv = Vector::new(0.0, 0.0, -1.0);
             let light = PointLight::new(Point::new(0.0, 0.0, 10.0), Color(1.0, 1.0, 1.0));
 
-            let result = M.lighting(light, POSITION, eyev, normalv);
+            let result = M.lighting(&light, POSITION, eyev, normalv);
 
             assert_eq!(result, Color(0.1, 0.1, 0.1));
         }
