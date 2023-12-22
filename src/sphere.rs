@@ -35,8 +35,6 @@ impl Sphere {
             new_ray = new_ray.transform(*t);
         }
 
-        let vec = Vec::new();
-
         // Vector from the sphere's center to the ray origin
         let sphere_to_ray = new_ray.origin - self.center;
 
@@ -47,7 +45,7 @@ impl Sphere {
         let discriminant = b.powi(2) - 4.0 * a * c;
 
         if discriminant < 0.0 {
-            return vec;
+            return Vec::new();
         }
 
         let t1 = (-b - discriminant.sqrt()) / (2.0 * a);

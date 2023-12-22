@@ -1,5 +1,6 @@
 use crate::{sphere::Sphere, transformation::Transformation, tuples::SpatialTuple};
 
+#[derive(Debug)]
 pub struct Ray {
     pub origin: SpatialTuple,
     pub direction: SpatialTuple,
