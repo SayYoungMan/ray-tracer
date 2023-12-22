@@ -3,6 +3,7 @@ use uuid::Uuid;
 use crate::{
     constants::EPSILON,
     intersection::Intersection,
+    materials::Material,
     rays::Ray,
     transformation::Transformation,
     tuples::{new_point, SpatialTuple},
@@ -14,6 +15,7 @@ pub struct Sphere {
     pub center: SpatialTuple,
     pub radius: f64,
     pub transformations: Vec<Transformation>,
+    pub material: Material,
 }
 
 impl Sphere {
@@ -23,6 +25,7 @@ impl Sphere {
             center,
             radius,
             transformations: Vec::new(),
+            material: Material::default(),
         }
     }
 
@@ -79,6 +82,7 @@ mod tests {
     use std::f64::consts::PI;
 
     use crate::{
+        color::Color,
         rays::Ray,
         tuples::{new_point, new_vector},
     };
@@ -260,5 +264,12 @@ mod tests {
         let n = s.normal_at(new_point(0.0, 2.0_f64.sqrt() / 2.0, -2.0_f64.sqrt() / 2.0));
 
         assert_eq!(n, new_vector(0.0, 0.97014, -0.24254));
+    }
+
+    #[test]
+    fn sphere_has_default_material() {
+        let s = Sphere::origin_unit_sphere();
+
+        assert_eq!(s.material, Material::default());
     }
 }

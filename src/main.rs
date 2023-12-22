@@ -7,6 +7,8 @@ mod color;
 mod constants;
 mod experiments;
 mod intersection;
+mod lights;
+mod materials;
 mod matrices;
 mod rays;
 mod sphere;
