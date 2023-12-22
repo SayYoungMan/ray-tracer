@@ -57,6 +57,21 @@ impl Sphere {
     pub fn set_transformation(&mut self, m: Vec<Transformation>) {
         self.transformations = m;
     }
+
+    fn is_point_on_surface(&self, p: SpatialTuple) -> bool {
+        (p - self.center).magnitude() == self.radius
+    }
+
+    pub fn normal_at(&self, p: SpatialTuple) -> SpatialTuple {
+        if !self.is_point_on_surface(p) {
+            panic!(
+                "Can't find the normal because the point {:?} is not on the surface of sphere {:#?}",
+                p, self
+            );
+        }
+
+        (p - self.center).normalize()
+    }
 }
 
 #[cfg(test)]
@@ -174,5 +189,50 @@ mod tests {
         let xs = s.intersect(r);
 
         assert_eq!(xs.len(), 0);
+    }
+
+    #[test]
+    fn the_normal_on_sphere() {
+        let s = Sphere::origin_unit_sphere();
+
+        // On the x-axis
+        let n = s.normal_at(new_point(1.0, 0.0, 0.0));
+        assert_eq!(n, new_vector(1.0, 0.0, 0.0));
+
+        // On the y-axis
+        let n = s.normal_at(new_point(0.0, 1.0, 0.0));
+        assert_eq!(n, new_vector(0.0, 1.0, 0.0));
+
+        // On the z-axis
+        let n = s.normal_at(new_point(0.0, 0.0, 1.0));
+        assert_eq!(n, new_vector(0.0, 0.0, 1.0));
+
+        // At non-axial point
+        let n = s.normal_at(new_point(
+            3.0_f64.sqrt() / 3.0,
+            3.0_f64.sqrt() / 3.0,
+            3.0_f64.sqrt() / 3.0,
+        ));
+        assert_eq!(
+            n,
+            new_vector(
+                3.0_f64.sqrt() / 3.0,
+                3.0_f64.sqrt() / 3.0,
+                3.0_f64.sqrt() / 3.0,
+            )
+        );
+    }
+
+    #[test]
+    fn normal_is_normalized_vector() {
+        let s = Sphere::origin_unit_sphere();
+
+        let n = s.normal_at(new_point(
+            3.0_f64.sqrt() / 3.0,
+            3.0_f64.sqrt() / 3.0,
+            3.0_f64.sqrt() / 3.0,
+        ));
+
+        assert_eq!(n, n.normalize());
     }
 }
