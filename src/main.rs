@@ -2,6 +2,7 @@
 
 use std::error::Error;
 
+mod camera;
 mod canvas;
 mod color;
 mod constants;
