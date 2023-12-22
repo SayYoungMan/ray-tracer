@@ -1,6 +1,7 @@
 use uuid::Uuid;
 
 use crate::{
+    constants::EPSILON,
     intersection::Intersection,
     rays::Ray,
     transformation::Transformation,
@@ -58,24 +59,25 @@ impl Sphere {
         self.transformations = m;
     }
 
-    fn is_point_on_surface(&self, p: SpatialTuple) -> bool {
-        (p - self.center).magnitude() == self.radius
-    }
-
     pub fn normal_at(&self, p: SpatialTuple) -> SpatialTuple {
-        if !self.is_point_on_surface(p) {
-            panic!(
-                "Can't find the normal because the point {:?} is not on the surface of sphere {:#?}",
-                p, self
-            );
+        let mut point = p;
+        let mut normal = (p - self.center).normalize();
+        for t in self.transformations.iter().rev() {
+            point = t.matrix().inverse() * point;
+            let object_normal = point - self.center;
+
+            normal = t.matrix().inverse().transpose() * object_normal;
+            normal.3 = 0.0;
         }
 
-        (p - self.center).normalize()
+        normal.normalize()
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::f64::consts::PI;
+
     use crate::{
         rays::Ray,
         tuples::{new_point, new_vector},
@@ -234,5 +236,29 @@ mod tests {
         ));
 
         assert_eq!(n, n.normalize());
+    }
+
+    #[test]
+    fn computing_normal_on_translated_sphere() {
+        let mut s = Sphere::origin_unit_sphere();
+        s.set_transformation(vec![Transformation::Translation(0.0, 1.0, 0.0)]);
+
+        let n = s.normal_at(new_point(0.0, 1.70711, -0.70711));
+
+        assert_eq!(n, new_vector(0.0, 0.70711, -0.70711));
+    }
+
+    #[test]
+    fn computing_normal_on_transformed_sphere() {
+        let mut s = Sphere::origin_unit_sphere();
+        let m = vec![
+            Transformation::Scaling(1.0, 0.5, 1.0),
+            Transformation::RotationZ(PI / 0.5),
+        ];
+        s.set_transformation(m);
+
+        let n = s.normal_at(new_point(0.0, 2.0_f64.sqrt() / 2.0, -2.0_f64.sqrt() / 2.0));
+
+        assert_eq!(n, new_vector(0.0, 0.97014, -0.24254));
     }
 }
