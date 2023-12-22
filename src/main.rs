@@ -14,6 +14,7 @@ mod rays;
 mod sphere;
 mod transformation;
 mod tuples;
+mod world;
 
 fn main() -> Result<(), Box<dyn Error>> {
     // experiments::projectile::draw_projectile()

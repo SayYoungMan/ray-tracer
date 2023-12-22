@@ -1,5 +1,6 @@
 use crate::{color::Color, tuples::Point};
 
+#[derive(Debug, PartialEq)]
 pub struct PointLight {
     pub position: Point,
     pub intensity: Color,
