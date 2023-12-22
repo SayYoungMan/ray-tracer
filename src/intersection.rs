@@ -154,7 +154,7 @@ mod tests {
 
     #[test]
     fn hit_when_intersection_occurs_inside() {
-        let r = Ray::new(Point::new(0.0, 0.0, 0.0), Vector::new(0.0, 0.0, 1.0));
+        let r = Ray::new(Point::origin(), Vector::new(0.0, 0.0, 1.0));
         let shape = Sphere::new();
         let i = Intersection {
             t: 1.0,
