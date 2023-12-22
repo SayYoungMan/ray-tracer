@@ -1,4 +1,17 @@
-use crate::sphere::Sphere;
+use crate::{
+    rays::Ray,
+    sphere::Sphere,
+    tuples::{Point, Vector},
+};
+
+pub struct Computations<'a> {
+    pub t: f64,
+    pub object: &'a Sphere,
+    pub point: Point,
+    pub eyev: Vector,
+    pub normalv: Vector,
+    inside: bool,
+}
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Intersection<'a> {
@@ -9,6 +22,29 @@ pub struct Intersection<'a> {
 impl<'a> Intersection<'a> {
     pub fn new(t: f64, object: &'a Sphere) -> Self {
         Intersection { t, object }
+    }
+
+    pub fn prepare_computations(&self, ray: Ray) -> Computations<'a> {
+        let point = ray.position(self.t);
+        let eyev = -ray.direction;
+        let mut normalv = self.object.normal_at(point);
+        let inside: bool;
+
+        if normalv.dot(&eyev) < 0.0 {
+            inside = true;
+            normalv = -normalv;
+        } else {
+            inside = false;
+        }
+
+        Computations {
+            t: self.t,
+            object: self.object,
+            point,
+            eyev,
+            normalv,
+            inside,
+        }
     }
 }
 
@@ -82,5 +118,55 @@ mod tests {
         let i = hit(xs).unwrap();
 
         assert_eq!(i, i4);
+    }
+
+    #[test]
+    fn precomputing_state_of_intersection() {
+        let r = Ray::new(Point::new(0.0, 0.0, -5.0), Vector::new(0.0, 0.0, 1.0));
+        let shape = Sphere::origin_unit_sphere();
+        let i = Intersection {
+            t: 4.0,
+            object: &shape,
+        };
+
+        let comps = i.prepare_computations(r);
+
+        assert_eq!(comps.t, i.t);
+        assert_eq!(comps.object, i.object);
+        assert_eq!(comps.point, Point::new(0.0, 0.0, -1.0));
+        assert_eq!(comps.eyev, Vector::new(0.0, 0.0, -1.0));
+        assert_eq!(comps.normalv, Vector::new(0.0, 0.0, -1.0));
+    }
+
+    #[test]
+    fn hit_when_intersection_occurs_outside() {
+        let r = Ray::new(Point::new(0.0, 0.0, -5.0), Vector::new(0.0, 0.0, 1.0));
+        let shape = Sphere::origin_unit_sphere();
+        let i = Intersection {
+            t: 4.0,
+            object: &shape,
+        };
+
+        let comps = i.prepare_computations(r);
+
+        assert_eq!(comps.inside, false);
+    }
+
+    #[test]
+    fn hit_when_intersection_occurs_inside() {
+        let r = Ray::new(Point::new(0.0, 0.0, 0.0), Vector::new(0.0, 0.0, 1.0));
+        let shape = Sphere::origin_unit_sphere();
+        let i = Intersection {
+            t: 1.0,
+            object: &shape,
+        };
+
+        let comps = i.prepare_computations(r);
+
+        assert_eq!(comps.point, Point::new(0.0, 0.0, 1.0));
+        assert_eq!(comps.eyev, Vector::new(0.0, 0.0, -1.0));
+        // Normal is inverted
+        assert_eq!(comps.normalv, Vector::new(0.0, 0.0, -1.0));
+        assert_eq!(comps.inside, true);
     }
 }
