@@ -3,7 +3,7 @@ use std::{error::Error, f64::consts::PI};
 use crate::{
     canvas::Canvas,
     color::Color,
-    tuples::{new_point, SpatialTuple},
+    tuples::{Point, Tuple},
 };
 
 const ARM_LENGTH: f64 = 37.5;
@@ -12,7 +12,7 @@ const FULL_LENGTH: f64 = 100.0;
 
 pub fn draw_clock() -> Result<(), Box<dyn Error>> {
     let mut canvas = Canvas::new(FULL_LENGTH as usize, FULL_LENGTH as usize);
-    let twelve_oclock = new_point(0.0, 0.0, ARM_LENGTH);
+    let twelve_oclock = Point::new(0.0, 0.0, ARM_LENGTH);
     draw_point(&mut canvas, &twelve_oclock);
 
     for i in 1..12 {
@@ -24,7 +24,7 @@ pub fn draw_clock() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn draw_point(canvas: &mut Canvas, point: &SpatialTuple) {
+fn draw_point(canvas: &mut Canvas, point: &Point) {
     canvas.write_pixel(
         (MID_POINT + point.2) as usize,
         (MID_POINT - point.0) as usize,

@@ -1,13 +1,17 @@
-use crate::{sphere::Sphere, transformation::Transformation, tuples::SpatialTuple};
+use crate::{
+    sphere::Sphere,
+    transformation::Transformation,
+    tuples::{Point, Tuple, Vector},
+};
 
 #[derive(Debug)]
 pub struct Ray {
-    pub origin: SpatialTuple,
-    pub direction: SpatialTuple,
+    pub origin: Point,
+    pub direction: Vector,
 }
 
 impl Ray {
-    pub fn new(origin: SpatialTuple, direction: SpatialTuple) -> Self {
+    pub fn new(origin: Point, direction: Vector) -> Self {
         if origin.3 != 1.0 || direction.3 != 0.0 {
             panic!("The origin of ray should be a point and direction should be a vector. Received origin: {:#?} and direction: {:#?}", origin, direction)
         }
@@ -15,7 +19,7 @@ impl Ray {
         Ray { origin, direction }
     }
 
-    pub fn position(&self, t: f64) -> SpatialTuple {
+    pub fn position(&self, t: f64) -> Point {
         self.origin + self.direction * t
     }
 
@@ -51,14 +55,12 @@ impl Ray {
 
 #[cfg(test)]
 mod tests {
-    use crate::tuples::{new_point, new_vector};
-
     use super::*;
 
     #[test]
     fn creating_and_querying_ray() {
-        let origin = new_point(1.0, 2.0, 3.0);
-        let direction = new_vector(4.0, 5.0, 6.0);
+        let origin = Point::new(1.0, 2.0, 3.0);
+        let direction = Vector::new(4.0, 5.0, 6.0);
 
         let r = Ray { origin, direction };
 
@@ -69,35 +71,35 @@ mod tests {
     #[test]
     fn computing_point_from_distance() {
         let r = Ray {
-            origin: new_point(2.0, 3.0, 4.0),
-            direction: new_vector(1.0, 0.0, 0.0),
+            origin: Point::new(2.0, 3.0, 4.0),
+            direction: Vector::new(1.0, 0.0, 0.0),
         };
 
-        assert_eq!(r.position(0.0), new_point(2.0, 3.0, 4.0));
-        assert_eq!(r.position(1.0), new_point(3.0, 3.0, 4.0));
-        assert_eq!(r.position(-1.0), new_point(1.0, 3.0, 4.0));
-        assert_eq!(r.position(2.5), new_point(4.5, 3.0, 4.0));
+        assert_eq!(r.position(0.0), Point::new(2.0, 3.0, 4.0));
+        assert_eq!(r.position(1.0), Point::new(3.0, 3.0, 4.0));
+        assert_eq!(r.position(-1.0), Point::new(1.0, 3.0, 4.0));
+        assert_eq!(r.position(2.5), Point::new(4.5, 3.0, 4.0));
     }
 
     #[test]
     fn translating_ray() {
-        let r = Ray::new(new_point(1.0, 2.0, 3.0), new_vector(0.0, 1.0, 0.0));
+        let r = Ray::new(Point::new(1.0, 2.0, 3.0), Vector::new(0.0, 1.0, 0.0));
         let m = Transformation::Translation(3.0, 4.0, 5.0);
 
         let r2 = r.transform(m);
 
-        assert_eq!(r2.origin, new_point(-2.0, -2.0, -2.0));
-        assert_eq!(r2.direction, new_vector(0.0, 1.0, 0.0));
+        assert_eq!(r2.origin, Point::new(-2.0, -2.0, -2.0));
+        assert_eq!(r2.direction, Vector::new(0.0, 1.0, 0.0));
     }
 
     #[test]
     fn scaling_ray() {
-        let r = Ray::new(new_point(1.0, 2.0, 3.0), new_vector(0.0, 1.0, 0.0));
+        let r = Ray::new(Point::new(1.0, 2.0, 3.0), Vector::new(0.0, 1.0, 0.0));
         let m = Transformation::Scaling(2.0, 3.0, 4.0);
 
         let r2 = r.transform(m);
 
-        assert_eq!(r2.origin, new_point(0.5, 0.66667, 0.75));
-        assert_eq!(r2.direction, new_vector(0.0, 0.33333, 0.0));
+        assert_eq!(r2.origin, Point::new(0.5, 0.66667, 0.75));
+        assert_eq!(r2.direction, Vector::new(0.0, 0.33333, 0.0));
     }
 }

@@ -1,4 +1,8 @@
-use crate::{color::Color, lights::PointLight, tuples::SpatialTuple};
+use crate::{
+    color::Color,
+    lights::PointLight,
+    tuples::{Point, Vector},
+};
 
 #[derive(Debug, PartialEq)]
 pub struct Material {
@@ -27,9 +31,9 @@ impl Material {
     pub fn lighting(
         &self,
         light: PointLight,
-        point: SpatialTuple,
-        eyev: SpatialTuple,
-        normalv: SpatialTuple,
+        point: Point,
+        eyev: Vector,
+        normalv: Vector,
     ) -> Color {
         // Combine the surface color with the light's color/intensity
         let effective_color = self.color * light.intensity;
@@ -88,10 +92,7 @@ mod tests {
 
     mod lighting {
         use super::*;
-        use crate::{
-            lights::PointLight,
-            tuples::{new_point, new_vector, SpatialTuple},
-        };
+        use crate::lights::PointLight;
 
         const M: Material = Material {
             color: Color(1.0, 1.0, 1.0),
@@ -100,14 +101,14 @@ mod tests {
             specular: 0.9,
             shininess: 200.0,
         };
-        const POSITION: SpatialTuple = SpatialTuple(0.0, 0.0, 0.0, 1.0);
+        const POSITION: Point = Point(0.0, 0.0, 0.0, 1.0);
 
         #[test]
         fn lighting_with_eye_between_light_and_surface() {
             // Ambient, diffuse, and specular all at full strength
-            let eyev = new_vector(0.0, 0.0, -1.0);
-            let normalv = new_vector(0.0, 0.0, -1.0);
-            let light = PointLight::new(new_point(0.0, 0.0, -10.0), Color(1.0, 1.0, 1.0));
+            let eyev = Vector::new(0.0, 0.0, -1.0);
+            let normalv = Vector::new(0.0, 0.0, -1.0);
+            let light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color(1.0, 1.0, 1.0));
 
             let result = M.lighting(light, POSITION, eyev, normalv);
 
@@ -118,9 +119,9 @@ mod tests {
         fn lighting_with_eye_between_light_and_surface_with_eye_offset_45deg() {
             // Ambient and diffuse should still be full strength because the light and normal vectors are the same
             // Specular value have fallen off to 0
-            let eyev = new_vector(0.0, 2.0_f64.sqrt() / 2.0, -2.0_f64.sqrt() / 2.0);
-            let normalv = new_vector(0.0, 0.0, -1.0);
-            let light = PointLight::new(new_point(0.0, 0.0, -10.0), Color(1.0, 1.0, 1.0));
+            let eyev = Vector::new(0.0, 2.0_f64.sqrt() / 2.0, -2.0_f64.sqrt() / 2.0);
+            let normalv = Vector::new(0.0, 0.0, -1.0);
+            let light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color(1.0, 1.0, 1.0));
 
             let result = M.lighting(light, POSITION, eyev, normalv);
 
@@ -131,9 +132,9 @@ mod tests {
         fn lighting_with_eye_opposite_surface_with_light_offset_45deg() {
             // Angle between light and normal vectors changed so diffuse changes
             // Specular component falls off to 0 as well
-            let eyev = new_vector(0.0, 0.0, -1.0);
-            let normalv = new_vector(0.0, 0.0, -1.0);
-            let light = PointLight::new(new_point(0.0, 10.0, -10.0), Color(1.0, 1.0, 1.0));
+            let eyev = Vector::new(0.0, 0.0, -1.0);
+            let normalv = Vector::new(0.0, 0.0, -1.0);
+            let light = PointLight::new(Point::new(0.0, 10.0, -10.0), Color(1.0, 1.0, 1.0));
 
             let result = M.lighting(light, POSITION, eyev, normalv);
 
@@ -143,9 +144,9 @@ mod tests {
         #[test]
         fn lighting_with_eye_in_path_of_reflection_vector() {
             // Diffuse is the same as before but specular is at full strength
-            let eyev = new_vector(0.0, -2.0_f64.sqrt() / 2.0, -2.0_f64.sqrt() / 2.0);
-            let normalv = new_vector(0.0, 0.0, -1.0);
-            let light = PointLight::new(new_point(0.0, 10.0, -10.0), Color(1.0, 1.0, 1.0));
+            let eyev = Vector::new(0.0, -2.0_f64.sqrt() / 2.0, -2.0_f64.sqrt() / 2.0);
+            let normalv = Vector::new(0.0, 0.0, -1.0);
+            let light = PointLight::new(Point::new(0.0, 10.0, -10.0), Color(1.0, 1.0, 1.0));
 
             let result = M.lighting(light, POSITION, eyev, normalv);
 
@@ -155,9 +156,9 @@ mod tests {
         #[test]
         fn lighting_with_light_behind_the_surface() {
             // Light no longer illuminates the surface, so the diffuse and specular go to 0
-            let eyev = new_vector(0.0, 0.0, -1.0);
-            let normalv = new_vector(0.0, 0.0, -1.0);
-            let light = PointLight::new(new_point(0.0, 0.0, 10.0), Color(1.0, 1.0, 1.0));
+            let eyev = Vector::new(0.0, 0.0, -1.0);
+            let normalv = Vector::new(0.0, 0.0, -1.0);
+            let light = PointLight::new(Point::new(0.0, 0.0, 10.0), Color(1.0, 1.0, 1.0));
 
             let result = M.lighting(light, POSITION, eyev, normalv);
 

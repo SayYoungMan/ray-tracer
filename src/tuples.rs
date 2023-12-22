@@ -3,24 +3,99 @@ use crate::{
     transformation::{self, Transformation},
 };
 
-pub fn new_point(x: f64, y: f64, z: f64) -> SpatialTuple {
-    SpatialTuple(x, y, z, 1.0)
-}
+pub trait Tuple {
+    fn translate(self, x: f64, y: f64, z: f64) -> Self;
 
-pub fn new_vector(x: f64, y: f64, z: f64) -> SpatialTuple {
-    SpatialTuple(x, y, z, 0.0)
+    fn inverse_translate(self, x: f64, y: f64, z: f64) -> Self;
+
+    fn scale(self, x: f64, y: f64, z: f64) -> Self;
+
+    fn inverse_scale(self, x: f64, y: f64, z: f64) -> Self;
+
+    fn rotate_x(self, r: f64) -> Self;
+
+    fn inverse_rotate_x(self, r: f64) -> Self;
+
+    fn rotate_y(self, r: f64) -> Self;
+
+    fn inverse_rotate_y(self, r: f64) -> Self;
+
+    fn rotate_z(self, r: f64) -> Self;
+
+    fn inverse_rotate_z(self, r: f64) -> Self;
+
+    fn shear(self, x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Self;
+
+    fn inverse_shear(self, x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Self;
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct SpatialTuple(pub f64, pub f64, pub f64, pub f64);
+pub struct Vector(pub f64, pub f64, pub f64, pub f64);
 
-impl SpatialTuple {
+impl Tuple for Vector {
+    fn translate(self, x: f64, y: f64, z: f64) -> Self {
+        Transformation::Translation(x, y, z).matrix() * self
+    }
+
+    fn inverse_translate(self, x: f64, y: f64, z: f64) -> Self {
+        Transformation::Translation(x, y, z).matrix().inverse() * self
+    }
+
+    fn scale(self, x: f64, y: f64, z: f64) -> Self {
+        Transformation::Scaling(x, y, z).matrix() * self
+    }
+
+    fn inverse_scale(self, x: f64, y: f64, z: f64) -> Self {
+        Transformation::Scaling(x, y, z).matrix().inverse() * self
+    }
+
+    fn rotate_x(self, r: f64) -> Self {
+        Transformation::RotationX(r).matrix() * self
+    }
+
+    fn inverse_rotate_x(self, r: f64) -> Self {
+        Transformation::RotationX(r).matrix().inverse() * self
+    }
+
+    fn rotate_y(self, r: f64) -> Self {
+        Transformation::RotationY(r).matrix() * self
+    }
+
+    fn inverse_rotate_y(self, r: f64) -> Self {
+        Transformation::RotationY(r).matrix().inverse() * self
+    }
+
+    fn rotate_z(self, r: f64) -> Self {
+        Transformation::RotationZ(r).matrix() * self
+    }
+
+    fn inverse_rotate_z(self, r: f64) -> Self {
+        Transformation::RotationZ(r).matrix().inverse() * self
+    }
+
+    fn shear(self, x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Self {
+        Transformation::Shearing(x_y, x_z, y_x, y_z, z_x, z_y).matrix() * self
+    }
+
+    fn inverse_shear(self, x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Self {
+        Transformation::Shearing(x_y, x_z, y_x, y_z, z_x, z_y)
+            .matrix()
+            .inverse()
+            * self
+    }
+}
+
+impl Vector {
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
+        Vector(x, y, z, 0.0)
+    }
+
     pub fn from_vec(vec: Vec<f64>) -> Self {
         if vec.len() != 4 {
-            panic!("Invalid length of vector received: {:#?}", vec);
+            panic!("Invalid length of vector received: {:?}", vec);
         }
 
-        SpatialTuple(vec[0], vec[1], vec[2], vec[3])
+        Vector(vec[0], vec[1], vec[2], vec[3])
     }
 
     pub fn magnitude(&self) -> f64 {
@@ -34,92 +109,23 @@ impl SpatialTuple {
     }
 
     pub fn dot(&self, other: &Self) -> f64 {
-        if !self.is_vector() || !other.is_vector() {
-            panic!(
-                "Dot product is only allowed on vectors: Self {}, Other {}",
-                self.3, other.3
-            );
-        }
-
         self.0 * other.0 + self.1 * other.1 + self.2 * other.2 + self.3 * other.3
     }
 
     pub fn cross(&self, other: &Self) -> Self {
-        if !self.is_vector() || !other.is_vector() {
-            panic!(
-                "Cross product is only allowed on vectors: Self {}, Other {}",
-                self.3, other.3
-            );
-        }
-
-        new_vector(
+        Vector::new(
             self.1 * other.2 - self.2 * other.1,
             self.2 * other.0 - self.0 * other.2,
             self.0 * other.1 - self.1 * other.0,
         )
     }
 
-    pub fn is_vector(&self) -> bool {
-        self.3 == 0.0
-    }
-
-    pub fn translate(self, x: f64, y: f64, z: f64) -> Self {
-        Transformation::Translation(x, y, z).matrix() * self
-    }
-
-    pub fn inverse_translate(self, x: f64, y: f64, z: f64) -> Self {
-        Transformation::Translation(x, y, z).matrix().inverse() * self
-    }
-
-    pub fn scale(self, x: f64, y: f64, z: f64) -> Self {
-        Transformation::Scaling(x, y, z).matrix() * self
-    }
-
-    pub fn inverse_scale(self, x: f64, y: f64, z: f64) -> Self {
-        Transformation::Scaling(x, y, z).matrix().inverse() * self
-    }
-
-    pub fn rotate_x(self, r: f64) -> Self {
-        Transformation::RotationX(r).matrix() * self
-    }
-
-    pub fn inverse_rotate_x(self, r: f64) -> Self {
-        Transformation::RotationX(r).matrix().inverse() * self
-    }
-
-    pub fn rotate_y(self, r: f64) -> Self {
-        Transformation::RotationY(r).matrix() * self
-    }
-
-    pub fn inverse_rotate_y(self, r: f64) -> Self {
-        Transformation::RotationY(r).matrix().inverse() * self
-    }
-
-    pub fn rotate_z(self, r: f64) -> Self {
-        Transformation::RotationZ(r).matrix() * self
-    }
-
-    pub fn inverse_rotate_z(self, r: f64) -> Self {
-        Transformation::RotationZ(r).matrix().inverse() * self
-    }
-
-    pub fn shear(self, x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Self {
-        Transformation::Shearing(x_y, x_z, y_x, y_z, z_x, z_y).matrix() * self
-    }
-
-    pub fn inverse_shear(self, x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Self {
-        Transformation::Shearing(x_y, x_z, y_x, y_z, z_x, z_y)
-            .matrix()
-            .inverse()
-            * self
-    }
-
-    pub fn reflect(self, normal: SpatialTuple) -> Self {
+    pub fn reflect(self, normal: Self) -> Self {
         self - normal * 2.0 * self.dot(&normal)
     }
 }
 
-impl PartialEq for SpatialTuple {
+impl PartialEq for Vector {
     fn eq(&self, other: &Self) -> bool {
         (self.0 - other.0).abs() < EPSILON
             && (self.1 - other.1).abs() < EPSILON
@@ -128,7 +134,7 @@ impl PartialEq for SpatialTuple {
     }
 }
 
-impl std::ops::Add for SpatialTuple {
+impl std::ops::Add for Vector {
     type Output = Self;
 
     fn add(self, other: Self) -> Self::Output {
@@ -141,11 +147,11 @@ impl std::ops::Add for SpatialTuple {
     }
 }
 
-impl std::ops::Add<&SpatialTuple> for SpatialTuple {
-    type Output = Self;
+impl std::ops::Add<Point> for Vector {
+    type Output = Point;
 
-    fn add(self, other: &SpatialTuple) -> Self::Output {
-        Self(
+    fn add(self, other: Point) -> Self::Output {
+        Point(
             self.0 + other.0,
             self.1 + other.1,
             self.2 + other.2,
@@ -154,7 +160,7 @@ impl std::ops::Add<&SpatialTuple> for SpatialTuple {
     }
 }
 
-impl std::ops::Sub for SpatialTuple {
+impl std::ops::Sub for Vector {
     type Output = Self;
 
     fn sub(self, other: Self) -> Self::Output {
@@ -167,7 +173,7 @@ impl std::ops::Sub for SpatialTuple {
     }
 }
 
-impl std::ops::Neg for SpatialTuple {
+impl std::ops::Neg for Vector {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
@@ -175,7 +181,7 @@ impl std::ops::Neg for SpatialTuple {
     }
 }
 
-impl std::ops::Mul<f64> for SpatialTuple {
+impl std::ops::Mul<f64> for Vector {
     type Output = Self;
 
     fn mul(self, scalar: f64) -> Self::Output {
@@ -188,7 +194,7 @@ impl std::ops::Mul<f64> for SpatialTuple {
     }
 }
 
-impl std::ops::Div<f64> for SpatialTuple {
+impl std::ops::Div<f64> for Vector {
     type Output = Self;
 
     fn div(self, scalar: f64) -> Self::Output {
@@ -201,6 +207,132 @@ impl std::ops::Div<f64> for SpatialTuple {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct Point(pub f64, pub f64, pub f64, pub f64);
+
+impl Tuple for Point {
+    fn translate(self, x: f64, y: f64, z: f64) -> Self {
+        Transformation::Translation(x, y, z).matrix() * self
+    }
+
+    fn inverse_translate(self, x: f64, y: f64, z: f64) -> Self {
+        Transformation::Translation(x, y, z).matrix().inverse() * self
+    }
+
+    fn scale(self, x: f64, y: f64, z: f64) -> Self {
+        Transformation::Scaling(x, y, z).matrix() * self
+    }
+
+    fn inverse_scale(self, x: f64, y: f64, z: f64) -> Self {
+        Transformation::Scaling(x, y, z).matrix().inverse() * self
+    }
+
+    fn rotate_x(self, r: f64) -> Self {
+        Transformation::RotationX(r).matrix() * self
+    }
+
+    fn inverse_rotate_x(self, r: f64) -> Self {
+        Transformation::RotationX(r).matrix().inverse() * self
+    }
+
+    fn rotate_y(self, r: f64) -> Self {
+        Transformation::RotationY(r).matrix() * self
+    }
+
+    fn inverse_rotate_y(self, r: f64) -> Self {
+        Transformation::RotationY(r).matrix().inverse() * self
+    }
+
+    fn rotate_z(self, r: f64) -> Self {
+        Transformation::RotationZ(r).matrix() * self
+    }
+
+    fn inverse_rotate_z(self, r: f64) -> Self {
+        Transformation::RotationZ(r).matrix().inverse() * self
+    }
+
+    fn shear(self, x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Self {
+        Transformation::Shearing(x_y, x_z, y_x, y_z, z_x, z_y).matrix() * self
+    }
+
+    fn inverse_shear(self, x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Self {
+        Transformation::Shearing(x_y, x_z, y_x, y_z, z_x, z_y)
+            .matrix()
+            .inverse()
+            * self
+    }
+}
+
+impl Point {
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
+        Point(x, y, z, 1.0)
+    }
+
+    pub fn from_vec(vec: Vec<f64>) -> Self {
+        if vec.len() != 4 {
+            panic!("Invalid length of vector received: {:?}", vec);
+        }
+
+        Point(vec[0], vec[1], vec[2], vec[3])
+    }
+}
+
+impl PartialEq for Point {
+    fn eq(&self, other: &Self) -> bool {
+        (self.0 - other.0).abs() < EPSILON
+            && (self.1 - other.1).abs() < EPSILON
+            && (self.2 - other.2).abs() < EPSILON
+            && (self.3 - other.3).abs() < EPSILON
+    }
+}
+
+impl std::ops::Add<Vector> for Point {
+    type Output = Self;
+
+    fn add(self, other: Vector) -> Self::Output {
+        Self(
+            self.0 + other.0,
+            self.1 + other.1,
+            self.2 + other.2,
+            self.3 + other.3,
+        )
+    }
+}
+
+impl std::ops::Sub for Point {
+    type Output = Vector;
+
+    fn sub(self, other: Self) -> Self::Output {
+        Vector(
+            self.0 - other.0,
+            self.1 - other.1,
+            self.2 - other.2,
+            self.3 - other.3,
+        )
+    }
+}
+
+impl std::ops::Sub<Vector> for Point {
+    type Output = Self;
+
+    fn sub(self, other: Vector) -> Self::Output {
+        Self(
+            self.0 - other.0,
+            self.1 - other.1,
+            self.2 - other.2,
+            self.3 - other.3,
+        )
+    }
+}
+
+impl std::ops::Neg for Point {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        Self(-self.0, -self.1, -self.2, -self.3)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::f64::consts::PI;
@@ -209,111 +341,113 @@ mod tests {
 
     #[test]
     fn point_creates_tuple_with_w1() {
-        let p = new_point(4.0, -4.0, 3.0);
+        let p = Point::new(4.0, -4.0, 3.0);
 
-        assert_eq!(p, SpatialTuple(4.0, -4.0, 3.0, 1.0));
+        assert_eq!(p, Point(4.0, -4.0, 3.0, 1.0));
     }
 
     #[test]
     fn vector_creates_tuple_with_w0() {
-        let v = new_vector(4.0, -4.0, 3.0);
+        let v = Vector::new(4.0, -4.0, 3.0);
 
-        assert_eq!(v, SpatialTuple(4.0, -4.0, 3.0, 0.0));
+        assert_eq!(v, Vector(4.0, -4.0, 3.0, 0.0));
     }
 
     #[test]
     fn adding_two_tuples() {
-        let a1 = SpatialTuple(3.0, -2.0, 5.0, 1.0);
-        let a2 = SpatialTuple(-2.0, 3.0, 1.0, 0.0);
+        let a1 = Point(3.0, -2.0, 5.0, 1.0);
+        let a2 = Vector(-2.0, 3.0, 1.0, 0.0);
 
-        assert_eq!(a1 + a2, SpatialTuple(1.0, 1.0, 6.0, 1.0));
+        assert_eq!(a1 + a2, Point(1.0, 1.0, 6.0, 1.0));
     }
 
     #[test]
     fn subtracting_two_points() {
-        let p1 = new_point(3.0, 2.0, 1.0);
-        let p2 = new_point(5.0, 6.0, 7.0);
+        let p1 = Point::new(3.0, 2.0, 1.0);
+        let p2 = Point::new(5.0, 6.0, 7.0);
 
         // Notice that you get a vector from subtracting two points
-        assert_eq!(p1 - p2, new_vector(-2.0, -4.0, -6.0));
+        assert_eq!(p1 - p2, Vector::new(-2.0, -4.0, -6.0));
     }
 
     #[test]
     fn subtracting_vector_from_point() {
-        let p = new_point(3.0, 2.0, 1.0);
-        let v = new_vector(5.0, 6.0, 7.0);
+        let p = Point::new(3.0, 2.0, 1.0);
+        let v = Vector::new(5.0, 6.0, 7.0);
 
         // Conceptually, this is just moving backward by the given vector
-        assert_eq!(p - v, new_point(-2.0, -4.0, -6.0));
+        assert_eq!(p - v, Point::new(-2.0, -4.0, -6.0));
     }
 
     #[test]
     fn subtracting_two_vectors() {
-        let v1 = new_vector(3.0, 2.0, 1.0);
-        let v2 = new_vector(5.0, 6.0, 7.0);
+        let v1 = Vector::new(3.0, 2.0, 1.0);
+        let v2 = Vector::new(5.0, 6.0, 7.0);
 
         // This represents the change in direction between the two
-        assert_eq!(v1 - v2, new_vector(-2.0, -4.0, -6.0));
+        assert_eq!(v1 - v2, Vector::new(-2.0, -4.0, -6.0));
     }
 
     #[test]
     fn negating_tuple() {
-        let a = SpatialTuple(1.0, -2.0, 3.0, -4.0);
+        let a = Vector(1.0, -2.0, 3.0, -4.0);
+        let b = Point(1.0, -2.0, 3.0, -4.0);
 
-        assert_eq!(-a, SpatialTuple(-1.0, 2.0, -3.0, 4.0));
+        assert_eq!(-a, Vector(-1.0, 2.0, -3.0, 4.0));
+        assert_eq!(-b, Point(-1.0, 2.0, -3.0, 4.0));
     }
 
     #[test]
-    fn multiplying_tuple_by_scalar() {
-        let a = SpatialTuple(1.0, -2.0, 3.0, -4.0);
+    fn multiplying_vector_by_scalar() {
+        let a = Vector(1.0, -2.0, 3.0, -4.0);
 
-        assert_eq!(a * 3.5, SpatialTuple(3.5, -7.0, 10.5, -14.0));
+        assert_eq!(a * 3.5, Vector(3.5, -7.0, 10.5, -14.0));
     }
 
     #[test]
-    fn multiplying_tuple_by_fraction() {
-        let a = SpatialTuple(1.0, -2.0, 3.0, -4.0);
+    fn multiplying_vector_by_fraction() {
+        let a = Vector(1.0, -2.0, 3.0, -4.0);
 
-        assert_eq!(a * 0.5, SpatialTuple(0.5, -1.0, 1.5, -2.0));
+        assert_eq!(a * 0.5, Vector(0.5, -1.0, 1.5, -2.0));
     }
 
     #[test]
-    fn dividing_tuple_by_scalar() {
-        let a = SpatialTuple(1.0, -2.0, 3.0, -4.0);
+    fn dividing_vector_by_scalar() {
+        let a = Vector(1.0, -2.0, 3.0, -4.0);
 
-        assert_eq!(a / 2.0, SpatialTuple(0.5, -1.0, 1.5, -2.0));
+        assert_eq!(a / 2.0, Vector(0.5, -1.0, 1.5, -2.0));
     }
 
     #[test]
     fn computing_magnitude_of_vectors() {
-        let v = new_vector(1.0, 0.0, 0.0);
+        let v = Vector::new(1.0, 0.0, 0.0);
         assert_eq!(v.magnitude(), 1.0);
 
-        let v = new_vector(0.0, 1.0, 0.0);
+        let v = Vector::new(0.0, 1.0, 0.0);
         assert_eq!(v.magnitude(), 1.0);
 
-        let v = new_vector(0.0, 0.0, 1.0);
+        let v = Vector::new(0.0, 0.0, 1.0);
         assert_eq!(v.magnitude(), 1.0);
 
-        let v = new_vector(1.0, 2.0, 3.0);
+        let v = Vector::new(1.0, 2.0, 3.0);
         assert_eq!(v.magnitude(), 14.0_f64.sqrt());
 
-        let v = new_vector(-1.0, -2.0, -3.0);
+        let v = Vector::new(-1.0, -2.0, -3.0);
         assert_eq!(v.magnitude(), 14.0_f64.sqrt());
     }
 
     #[test]
     fn normalizing_vectors() {
-        let v = new_vector(4.0, 0.0, 0.0);
-        assert_eq!(v.normalize(), new_vector(1.0, 0.0, 0.0));
+        let v = Vector::new(4.0, 0.0, 0.0);
+        assert_eq!(v.normalize(), Vector::new(1.0, 0.0, 0.0));
 
-        let v = new_vector(1.0, 2.0, 3.0);
-        assert_eq!(v.normalize(), new_vector(0.26726, 0.53452, 0.80178));
+        let v = Vector::new(1.0, 2.0, 3.0);
+        assert_eq!(v.normalize(), Vector::new(0.26726, 0.53452, 0.80178));
     }
 
     #[test]
     fn magnitude_of_normalized_vector() {
-        let v = new_vector(1.0, 2.0, 3.0);
+        let v = Vector::new(1.0, 2.0, 3.0);
         let norm = v.normalize();
 
         assert_eq!(norm.magnitude(), 1.0);
@@ -321,50 +455,50 @@ mod tests {
 
     #[test]
     fn dot_product_of_two_vectors() {
-        let a = new_vector(1.0, 2.0, 3.0);
-        let b = new_vector(2.0, 3.0, 4.0);
+        let a = Vector::new(1.0, 2.0, 3.0);
+        let b = Vector::new(2.0, 3.0, 4.0);
 
         assert_eq!(a.dot(&b), 20.0);
     }
 
     #[test]
     fn cross_product_of_two_vectors() {
-        let a = new_vector(1.0, 2.0, 3.0);
-        let b = new_vector(2.0, 3.0, 4.0);
+        let a = Vector::new(1.0, 2.0, 3.0);
+        let b = Vector::new(2.0, 3.0, 4.0);
 
-        assert_eq!(a.cross(&b), new_vector(-1.0, 2.0, -1.0));
-        assert_eq!(b.cross(&a), new_vector(1.0, -2.0, 1.0));
+        assert_eq!(a.cross(&b), Vector::new(-1.0, 2.0, -1.0));
+        assert_eq!(b.cross(&a), Vector::new(1.0, -2.0, 1.0));
     }
 
     #[test]
     fn chained_transformations() {
-        let p = new_point(1.0, 0.0, 1.0);
+        let p = Point::new(1.0, 0.0, 1.0);
 
         assert_eq!(
             p.rotate_x(PI / 2.0)
                 .scale(5.0, 5.0, 5.0)
                 .translate(10.0, 5.0, 7.0),
-            new_point(15.0, 0.0, 7.0)
+            Point::new(15.0, 0.0, 7.0)
         );
     }
 
     #[test]
     fn reflecting_vector_at_45deg() {
-        let v = new_vector(1.0, -1.0, 0.0);
-        let n = new_vector(0.0, 1.0, 0.0);
+        let v = Vector::new(1.0, -1.0, 0.0);
+        let n = Vector::new(0.0, 1.0, 0.0);
 
         let r = v.reflect(n);
 
-        assert_eq!(r, new_vector(1.0, 1.0, 0.0));
+        assert_eq!(r, Vector::new(1.0, 1.0, 0.0));
     }
 
     #[test]
     fn reflecting_vector_off_slanted_surface() {
-        let v = new_vector(0.0, -1.0, 0.0);
-        let n = new_vector(2.0_f64.sqrt() / 2.0, 2.0_f64.sqrt() / 2.0, 0.0);
+        let v = Vector::new(0.0, -1.0, 0.0);
+        let n = Vector::new(2.0_f64.sqrt() / 2.0, 2.0_f64.sqrt() / 2.0, 0.0);
 
         let r = v.reflect(n);
 
-        assert_eq!(r, new_vector(1.0, 0.0, 0.0));
+        assert_eq!(r, Vector::new(1.0, 0.0, 0.0));
     }
 }

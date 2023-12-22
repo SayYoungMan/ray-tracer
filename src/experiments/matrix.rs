@@ -1,6 +1,6 @@
 use std::error::Error;
 
-use crate::{matrices::Matrix, tuples::SpatialTuple};
+use crate::{matrices::Matrix, tuples::Point};
 
 #[allow(non_snake_case, unused)]
 pub fn matrix_experiments() -> Result<(), Box<dyn Error>> {
@@ -39,7 +39,7 @@ pub fn matrix_experiments() -> Result<(), Box<dyn Error>> {
         vec![0.0, 0.0, 1.0, 0.0],
         vec![0.0, 0.0, 0.0, 1.0],
     ]);
-    let b = SpatialTuple(1.0, 2.0, 3.0, 1.0);
+    let b = Point(1.0, 2.0, 3.0, 1.0);
     // This doubles only the second element of the tuple
     println!("Second of identity matrix is 2: {:?}", A * b);
 

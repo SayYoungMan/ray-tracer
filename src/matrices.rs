@@ -1,6 +1,9 @@
 use std::error::Error;
 
-use crate::{constants::EPSILON, tuples::SpatialTuple};
+use crate::{
+    constants::EPSILON,
+    tuples::{Point, Vector},
+};
 
 #[derive(Debug, Clone)]
 pub struct Matrix {
@@ -214,10 +217,10 @@ impl std::ops::Mul<&Matrix> for Matrix {
     }
 }
 
-impl std::ops::Mul<SpatialTuple> for Matrix {
-    type Output = SpatialTuple;
+impl std::ops::Mul<Point> for Matrix {
+    type Output = Point;
 
-    fn mul(self, other: SpatialTuple) -> Self::Output {
+    fn mul(self, other: Point) -> Self::Output {
         if self.cols != 4 {
             panic!(
                 "The number of columns of matrix must be 4 but got {}",
@@ -234,7 +237,31 @@ impl std::ops::Mul<SpatialTuple> for Matrix {
             data.push(sum);
         }
 
-        SpatialTuple::from_vec(data)
+        Point::from_vec(data)
+    }
+}
+
+impl std::ops::Mul<Vector> for Matrix {
+    type Output = Vector;
+
+    fn mul(self, other: Vector) -> Self::Output {
+        if self.cols != 4 {
+            panic!(
+                "The number of columns of matrix must be 4 but got {}",
+                self.cols
+            );
+        }
+
+        let mut data = Vec::new();
+        for i in 0..self.rows {
+            let sum = self.at(i, 0) * other.0
+                + self.at(i, 1) * other.1
+                + self.at(i, 2) * other.2
+                + self.at(i, 3) * other.3;
+            data.push(sum);
+        }
+
+        Vector::from_vec(data)
     }
 }
 
@@ -359,9 +386,9 @@ mod tests {
             vec![8.0, 6.0, 4.0, 1.0],
             vec![0.0, 0.0, 0.0, 1.0],
         ]);
-        let b = SpatialTuple(1.0, 2.0, 3.0, 1.0);
+        let b = Point(1.0, 2.0, 3.0, 1.0);
 
-        let expected = SpatialTuple(18.0, 24.0, 33.0, 1.0);
+        let expected = Point(18.0, 24.0, 33.0, 1.0);
 
         assert_eq!(A * b, expected);
     }
@@ -374,7 +401,7 @@ mod tests {
             vec![2.0, 4.0, 8.0, 16.0],
             vec![4.0, 8.0, 16.0, 32.0],
         ]);
-        let a = SpatialTuple(1.0, 2.0, 3.0, 4.0);
+        let a = Point(1.0, 2.0, 3.0, 1.0);
         let identity_matrix = Matrix::identity();
 
         assert_eq!(A.clone() * &identity_matrix, A);

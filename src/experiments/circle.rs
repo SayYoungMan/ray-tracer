@@ -1,7 +1,7 @@
 use std::error::Error;
 
 use crate::{
-    canvas::Canvas, color::Color, intersection::hit, rays::Ray, sphere::Sphere, tuples::new_point,
+    canvas::Canvas, color::Color, intersection::hit, rays::Ray, sphere::Sphere, tuples::Point,
 };
 
 pub fn draw_circle() -> Result<(), Box<dyn Error>> {
@@ -9,7 +9,7 @@ pub fn draw_circle() -> Result<(), Box<dyn Error>> {
     const WALL_SIZE: f64 = 7.0;
     const WALL_Z: f64 = 10.0;
 
-    let ray_origin = new_point(0.0, 0.0, -5.0);
+    let ray_origin = Point::new(0.0, 0.0, -5.0);
     let pixel_size = WALL_SIZE / CANVAS_PIXELS as f64;
     let half = WALL_SIZE / 2.0;
 
@@ -27,7 +27,7 @@ pub fn draw_circle() -> Result<(), Box<dyn Error>> {
             let world_x = -half + pixel_size * x as f64;
 
             // Describe the point on the wall that the ray will target
-            let position = new_point(world_x, world_y, WALL_Z);
+            let position = Point::new(world_x, world_y, WALL_Z);
 
             let r = Ray::new(ray_origin, (position - ray_origin).normalize());
             let xs = sphere.intersect(r);

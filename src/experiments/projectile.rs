@@ -1,16 +1,16 @@
 use std::error::Error;
 
-use crate::tuples::{new_point, new_vector};
+use crate::tuples::{Point, Vector};
 use crate::{canvas::Canvas, color::Color, tuples};
 
 pub struct Projectile {
-    pub position: tuples::SpatialTuple,
-    pub velocity: tuples::SpatialTuple,
+    pub position: Point,
+    pub velocity: Vector,
 }
 
 pub struct Environment {
-    pub gravity: tuples::SpatialTuple,
-    pub wind: tuples::SpatialTuple,
+    pub gravity: Vector,
+    pub wind: Vector,
 }
 
 fn tick(env: &Environment, proj: &mut Projectile) {
@@ -33,15 +33,15 @@ pub fn tick_until_fallen(canvas: &mut Canvas, env: &Environment, proj: &mut Proj
 }
 
 pub fn draw_projectile() -> Result<(), Box<dyn Error>> {
-    let start = new_point(0.0, 1.0, 0.0);
-    let velocity = new_vector(1.0, 1.8, 0.0).normalize() * 11.25;
+    let start = Point::new(0.0, 1.0, 0.0);
+    let velocity = Vector::new(1.0, 1.8, 0.0).normalize() * 11.25;
     let mut p = Projectile {
         position: start,
         velocity,
     };
 
-    let gravity = new_vector(0.0, -0.1, 0.0);
-    let wind = new_vector(-0.01, 0.0, 0.0);
+    let gravity = Vector::new(0.0, -0.1, 0.0);
+    let wind = Vector::new(-0.01, 0.0, 0.0);
     let e = Environment { gravity, wind };
 
     let mut c = Canvas::new(900, 550);
