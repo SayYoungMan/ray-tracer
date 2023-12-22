@@ -113,6 +113,10 @@ impl SpatialTuple {
             .inverse()
             * self
     }
+
+    pub fn reflect(self, normal: SpatialTuple) -> Self {
+        self - normal * 2.0 * self.dot(&normal)
+    }
 }
 
 impl PartialEq for SpatialTuple {
@@ -342,5 +346,25 @@ mod tests {
                 .translate(10.0, 5.0, 7.0),
             new_point(15.0, 0.0, 7.0)
         );
+    }
+
+    #[test]
+    fn reflecting_vector_at_45deg() {
+        let v = new_vector(1.0, -1.0, 0.0);
+        let n = new_vector(0.0, 1.0, 0.0);
+
+        let r = v.reflect(n);
+
+        assert_eq!(r, new_vector(1.0, 1.0, 0.0));
+    }
+
+    #[test]
+    fn reflecting_vector_off_slanted_surface() {
+        let v = new_vector(0.0, -1.0, 0.0);
+        let n = new_vector(2.0_f64.sqrt() / 2.0, 2.0_f64.sqrt() / 2.0, 0.0);
+
+        let r = v.reflect(n);
+
+        assert_eq!(r, new_vector(1.0, 0.0, 0.0));
     }
 }
