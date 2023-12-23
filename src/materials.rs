@@ -4,7 +4,7 @@ use crate::{
     tuples::{Point, Vector},
 };
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Material {
     pub color: Color,
     pub ambient: f64,

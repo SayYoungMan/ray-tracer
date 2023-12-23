@@ -22,5 +22,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     // experiments::matrix::matrix_experiments()
     // experiments::clock::draw_clock()
     // experiments::circle::draw_circle()
-    experiments::sphere::draw_sphere()
+    // experiments::sphere::draw_sphere()
+    experiments::scene::draw_scene()
 }
