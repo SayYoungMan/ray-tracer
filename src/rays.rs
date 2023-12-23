@@ -34,15 +34,15 @@ impl Ray {
                 direction: self.direction.inverse_scale(x, y, z),
             },
             Transformation::RotationX(r) => Ray {
-                origin: self.origin,
+                origin: self.origin.inverse_rotate_x(r),
                 direction: self.direction.inverse_rotate_x(r),
             },
             Transformation::RotationY(r) => Ray {
-                origin: self.origin,
+                origin: self.origin.inverse_rotate_y(r),
                 direction: self.direction.inverse_rotate_y(r),
             },
             Transformation::RotationZ(r) => Ray {
-                origin: self.origin,
+                origin: self.origin.inverse_rotate_z(r),
                 direction: self.direction.inverse_rotate_z(r),
             },
             Transformation::Shearing(x_y, x_z, y_x, y_z, z_x, z_y) => Ray {
