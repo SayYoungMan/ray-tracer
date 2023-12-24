@@ -1,32 +1,17 @@
-use crate::{
-    constants::EPSILON,
-    transformation::{self, Transformation},
-};
+use crate::{constants::EPSILON, transformation};
 
 pub trait Tuple {
     fn translate(self, x: f64, y: f64, z: f64) -> Self;
 
-    fn inverse_translate(self, x: f64, y: f64, z: f64) -> Self;
-
     fn scale(self, x: f64, y: f64, z: f64) -> Self;
-
-    fn inverse_scale(self, x: f64, y: f64, z: f64) -> Self;
 
     fn rotate_x(self, r: f64) -> Self;
 
-    fn inverse_rotate_x(self, r: f64) -> Self;
-
     fn rotate_y(self, r: f64) -> Self;
-
-    fn inverse_rotate_y(self, r: f64) -> Self;
 
     fn rotate_z(self, r: f64) -> Self;
 
-    fn inverse_rotate_z(self, r: f64) -> Self;
-
     fn shear(self, x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Self;
-
-    fn inverse_shear(self, x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Self;
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -34,54 +19,27 @@ pub struct Vector(pub f64, pub f64, pub f64, pub f64);
 
 impl Tuple for Vector {
     fn translate(self, x: f64, y: f64, z: f64) -> Self {
-        Transformation::Translation(x, y, z).matrix() * self
-    }
-
-    fn inverse_translate(self, x: f64, y: f64, z: f64) -> Self {
-        Transformation::Translation(x, y, z).matrix().inverse() * self
+        transformation::translation(x, y, z) * self
     }
 
     fn scale(self, x: f64, y: f64, z: f64) -> Self {
-        Transformation::Scaling(x, y, z).matrix() * self
-    }
-
-    fn inverse_scale(self, x: f64, y: f64, z: f64) -> Self {
-        Transformation::Scaling(x, y, z).matrix().inverse() * self
+        transformation::scaling(x, y, z) * self
     }
 
     fn rotate_x(self, r: f64) -> Self {
-        Transformation::RotationX(r).matrix() * self
-    }
-
-    fn inverse_rotate_x(self, r: f64) -> Self {
-        Transformation::RotationX(r).matrix().inverse() * self
+        transformation::rotation_x(r) * self
     }
 
     fn rotate_y(self, r: f64) -> Self {
-        Transformation::RotationY(r).matrix() * self
-    }
-
-    fn inverse_rotate_y(self, r: f64) -> Self {
-        Transformation::RotationY(r).matrix().inverse() * self
+        transformation::rotation_y(r) * self
     }
 
     fn rotate_z(self, r: f64) -> Self {
-        Transformation::RotationZ(r).matrix() * self
-    }
-
-    fn inverse_rotate_z(self, r: f64) -> Self {
-        Transformation::RotationZ(r).matrix().inverse() * self
+        transformation::rotation_z(r) * self
     }
 
     fn shear(self, x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Self {
-        Transformation::Shearing(x_y, x_z, y_x, y_z, z_x, z_y).matrix() * self
-    }
-
-    fn inverse_shear(self, x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Self {
-        Transformation::Shearing(x_y, x_z, y_x, y_z, z_x, z_y)
-            .matrix()
-            .inverse()
-            * self
+        transformation::shearing(x_y, x_z, y_x, y_z, z_x, z_y) * self
     }
 }
 
@@ -212,54 +170,27 @@ pub struct Point(pub f64, pub f64, pub f64, pub f64);
 
 impl Tuple for Point {
     fn translate(self, x: f64, y: f64, z: f64) -> Self {
-        Transformation::Translation(x, y, z).matrix() * self
-    }
-
-    fn inverse_translate(self, x: f64, y: f64, z: f64) -> Self {
-        Transformation::Translation(x, y, z).matrix().inverse() * self
+        transformation::translation(x, y, z) * self
     }
 
     fn scale(self, x: f64, y: f64, z: f64) -> Self {
-        Transformation::Scaling(x, y, z).matrix() * self
-    }
-
-    fn inverse_scale(self, x: f64, y: f64, z: f64) -> Self {
-        Transformation::Scaling(x, y, z).matrix().inverse() * self
+        transformation::scaling(x, y, z) * self
     }
 
     fn rotate_x(self, r: f64) -> Self {
-        Transformation::RotationX(r).matrix() * self
-    }
-
-    fn inverse_rotate_x(self, r: f64) -> Self {
-        Transformation::RotationX(r).matrix().inverse() * self
+        transformation::rotation_x(r) * self
     }
 
     fn rotate_y(self, r: f64) -> Self {
-        Transformation::RotationY(r).matrix() * self
-    }
-
-    fn inverse_rotate_y(self, r: f64) -> Self {
-        Transformation::RotationY(r).matrix().inverse() * self
+        transformation::rotation_y(r) * self
     }
 
     fn rotate_z(self, r: f64) -> Self {
-        Transformation::RotationZ(r).matrix() * self
-    }
-
-    fn inverse_rotate_z(self, r: f64) -> Self {
-        Transformation::RotationZ(r).matrix().inverse() * self
+        transformation::rotation_z(r) * self
     }
 
     fn shear(self, x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Self {
-        Transformation::Shearing(x_y, x_z, y_x, y_z, z_x, z_y).matrix() * self
-    }
-
-    fn inverse_shear(self, x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Self {
-        Transformation::Shearing(x_y, x_z, y_x, y_z, z_x, z_y)
-            .matrix()
-            .inverse()
-            * self
+        transformation::shearing(x_y, x_z, y_x, y_z, z_x, z_y) * self
     }
 }
 

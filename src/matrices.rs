@@ -2,7 +2,7 @@ use std::error::Error;
 
 use crate::{
     constants::EPSILON,
-    tuples::{Point, Vector},
+    tuples::{Point, Tuple, Vector},
 };
 
 #[derive(Debug, Clone)]

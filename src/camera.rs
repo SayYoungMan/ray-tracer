@@ -87,7 +87,7 @@ mod tests {
     use crate::{
         color::Color,
         constants::EPSILON,
-        transformation::{view_transform, Transformation},
+        transformation::{rotation_y, translation, view_transform},
         tuples::{Point, Vector},
     };
 
@@ -137,8 +137,7 @@ mod tests {
     #[test]
     fn constructing_ray_when_camera_transformed() {
         let mut c = Camera::new(201, 101, PI / 2.0);
-        c.transform = Transformation::RotationY(PI / 4.0).matrix()
-            * Transformation::Translation(0.0, -2.0, 5.0).matrix();
+        c.transform = rotation_y(PI / 4.0) * translation(0.0, -2.0, 5.0);
 
         let r = c.ray_for_pixel(100.0, 50.0);
 

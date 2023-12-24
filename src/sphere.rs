@@ -4,15 +4,15 @@ use crate::{
     constants::EPSILON,
     intersection::Intersection,
     materials::Material,
+    matrices::Matrix,
     rays::Ray,
-    transformation::Transformation,
     tuples::{Point, Vector},
 };
 
 #[derive(Debug, PartialEq)]
 pub struct Sphere {
     id: Uuid,
-    pub transformations: Vec<Transformation>,
+    pub transformation: Matrix,
     pub material: Material,
 }
 
@@ -20,16 +20,13 @@ impl Sphere {
     pub fn new() -> Self {
         Sphere {
             id: Uuid::new_v4(),
-            transformations: Vec::new(),
+            transformation: Matrix::identity(),
             material: Material::default(),
         }
     }
 
     pub fn intersect(&self, ray: Ray) -> Vec<Intersection> {
-        let mut new_ray = ray;
-        for t in &self.transformations {
-            new_ray = new_ray.transform(*t);
-        }
+        let new_ray = ray.transform(self.transformation.inverse());
 
         // Vector from the sphere's center to the ray origin
         let sphere_to_ray = new_ray.origin - Point::origin();
@@ -50,22 +47,18 @@ impl Sphere {
         vec![Intersection::new(t1, &self), Intersection::new(t2, &self)]
     }
 
-    pub fn set_transformation(&mut self, m: Vec<Transformation>) {
-        self.transformations = m;
+    pub fn set_transformation(&mut self, m: Matrix) {
+        self.transformation = m;
     }
 
-    pub fn normal_at(&self, p: Point) -> Vector {
-        let mut point = p;
-        let mut normal = (p - Point::origin()).normalize();
-        for t in self.transformations.iter().rev() {
-            point = t.matrix().inverse() * point;
-            let object_normal = point - Point::origin();
+    pub fn normal_at(&self, world_point: Point) -> Vector {
+        let object_point = self.transformation.inverse() * world_point;
+        let object_normal = object_point - Point::origin();
 
-            normal = t.matrix().inverse().transpose() * object_normal;
-            normal.3 = 0.0;
-        }
+        let mut world_normal = self.transformation.inverse().transpose() * object_normal;
+        world_normal.3 = 0.0;
 
-        normal.normalize()
+        world_normal.normalize()
     }
 }
 
@@ -73,7 +66,11 @@ impl Sphere {
 mod tests {
     use std::f64::consts::PI;
 
-    use crate::{color::Color, rays::Ray};
+    use crate::{
+        color::Color,
+        rays::Ray,
+        transformation::{rotation_z, scaling, translation},
+    };
 
     use super::*;
 
@@ -151,14 +148,13 @@ mod tests {
     fn changing_sphere_transformation() {
         let mut s = Sphere::new();
 
-        assert_eq!(s.transformations.len(), 0);
+        assert_eq!(s.transformation, Matrix::identity());
 
-        let t = Transformation::Translation(2.0, 3.0, 4.0);
+        let t = translation(2.0, 3.0, 4.0);
 
-        s.set_transformation(vec![t]);
+        s.set_transformation(t.clone());
 
-        assert_eq!(s.transformations.len(), 1);
-        assert_eq!(s.transformations[0], t);
+        assert_eq!(s.transformation, t);
     }
 
     #[test]
@@ -166,7 +162,7 @@ mod tests {
         let r = Ray::new(Point::new(0.0, 0.0, -5.0), Vector::new(0.0, 0.0, 1.0));
         let mut s = Sphere::new();
 
-        s.set_transformation(vec![Transformation::Scaling(2.0, 2.0, 2.0)]);
+        s.set_transformation(scaling(2.0, 2.0, 2.0));
         let xs = s.intersect(r);
 
         assert_eq!(xs.len(), 2);
@@ -179,7 +175,7 @@ mod tests {
         let r = Ray::new(Point::new(0.0, 0.0, -5.0), Vector::new(0.0, 0.0, 1.0));
         let mut s = Sphere::new();
 
-        s.set_transformation(vec![Transformation::Translation(5.0, 0.0, 0.0)]);
+        s.set_transformation(translation(5.0, 0.0, 0.0));
         let xs = s.intersect(r);
 
         assert_eq!(xs.len(), 0);
@@ -233,7 +229,7 @@ mod tests {
     #[test]
     fn computing_normal_on_translated_sphere() {
         let mut s = Sphere::new();
-        s.set_transformation(vec![Transformation::Translation(0.0, 1.0, 0.0)]);
+        s.set_transformation(translation(0.0, 1.0, 0.0));
 
         let n = s.normal_at(Point::new(0.0, 1.70711, -0.70711));
 
@@ -243,10 +239,7 @@ mod tests {
     #[test]
     fn computing_normal_on_transformed_sphere() {
         let mut s = Sphere::new();
-        let m = vec![
-            Transformation::Scaling(1.0, 0.5, 1.0),
-            Transformation::RotationZ(PI / 0.5),
-        ];
+        let m = scaling(1.0, 0.5, 1.0) * rotation_z(PI / 5.0);
         s.set_transformation(m);
 
         let n = s.normal_at(Point::new(0.0, 2.0_f64.sqrt() / 2.0, -2.0_f64.sqrt() / 2.0));

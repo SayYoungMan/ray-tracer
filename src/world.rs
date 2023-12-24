@@ -4,7 +4,7 @@ use crate::{
     lights::PointLight,
     rays::Ray,
     sphere::Sphere,
-    transformation::Transformation,
+    transformation::scaling,
     tuples::Point,
 };
 
@@ -30,7 +30,7 @@ impl World {
         s1.material.specular = 0.2;
 
         let mut s2 = Sphere::new();
-        s2.set_transformation(vec![Transformation::Scaling(0.5, 0.5, 0.5)]);
+        s2.set_transformation(scaling(0.5, 0.5, 0.5));
 
         Self {
             objects: vec![s1, s2],
