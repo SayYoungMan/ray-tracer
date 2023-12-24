@@ -5,7 +5,7 @@ use crate::{
     color::Color,
     lights::PointLight,
     materials::Material,
-    sphere::Sphere,
+    shapes::sphere::Sphere,
     transformation::{rotation_x, rotation_y, scaling, translation, view_transform},
     tuples::{Point, Vector},
     world::{self, World},

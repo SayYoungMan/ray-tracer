@@ -1,7 +1,7 @@
 use crate::{
     constants::EPSILON,
     rays::Ray,
-    sphere::Sphere,
+    shapes::sphere::Sphere,
     tuples::{Point, Vector},
 };
 

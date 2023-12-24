@@ -1,6 +1,6 @@
 use crate::{
     matrices::Matrix,
-    sphere::Sphere,
+    shapes::sphere::Sphere,
     tuples::{Point, Tuple, Vector},
 };
 

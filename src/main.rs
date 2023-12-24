@@ -12,7 +12,7 @@ mod lights;
 mod materials;
 mod matrices;
 mod rays;
-mod sphere;
+mod shapes;
 mod transformation;
 mod tuples;
 mod world;

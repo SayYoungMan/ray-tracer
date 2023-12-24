@@ -1,7 +1,8 @@
 use std::error::Error;
 
 use crate::{
-    canvas::Canvas, color::Color, intersection::hit, rays::Ray, sphere::Sphere, tuples::Point,
+    canvas::Canvas, color::Color, intersection::hit, rays::Ray, shapes::sphere::Sphere,
+    tuples::Point,
 };
 
 pub fn draw_circle() -> Result<(), Box<dyn Error>> {
