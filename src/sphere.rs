@@ -9,7 +9,7 @@ use crate::{
     tuples::{Point, Vector},
 };
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Sphere {
     id: Uuid,
     pub transformation: Matrix,

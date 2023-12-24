@@ -1,4 +1,5 @@
 use crate::{
+    constants::EPSILON,
     rays::Ray,
     sphere::Sphere,
     tuples::{Point, Vector},
@@ -11,6 +12,7 @@ pub struct Computations<'a> {
     pub eyev: Vector,
     pub normalv: Vector,
     inside: bool,
+    pub over_point: Point,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -37,6 +39,10 @@ impl<'a> Intersection<'a> {
             inside = false;
         }
 
+        // Bump the point just a bit to make sure the intersection does not hide
+        // behind the surface due to floating number errors
+        let over_point = point + normalv * EPSILON;
+
         Computations {
             t: self.t,
             object: self.object,
@@ -44,6 +50,7 @@ impl<'a> Intersection<'a> {
             eyev,
             normalv,
             inside,
+            over_point,
         }
     }
 }
@@ -59,6 +66,8 @@ pub fn hit(intersections: Vec<Intersection>) -> Option<Intersection> {
 
 #[cfg(test)]
 mod tests {
+    use crate::{constants::EPSILON, transformation::translation};
+
     use super::*;
 
     #[test]
@@ -168,5 +177,18 @@ mod tests {
         // Normal is inverted
         assert_eq!(comps.normalv, Vector::new(0.0, 0.0, -1.0));
         assert_eq!(comps.inside, true);
+    }
+
+    #[test]
+    fn hit_should_offset_the_point() {
+        let r = Ray::new(Point::new(0.0, 0.0, -5.0), Vector::new(0.0, 0.0, 1.0));
+        let mut shape = Sphere::new();
+        shape.set_transformation(translation(0.0, 0.0, 1.0));
+        let i = Intersection::new(5.0, &shape);
+
+        let comps = i.prepare_computations(r);
+
+        assert!(comps.over_point.2 < -EPSILON / 2.0);
+        assert!(comps.point.2 > comps.over_point.2);
     }
 }
