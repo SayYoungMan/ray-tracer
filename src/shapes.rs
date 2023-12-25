@@ -22,6 +22,18 @@ pub trait Shape {
 
         self.local_intersect(local_ray)
     }
+
+    fn local_normal_at(&self, local_point: Point) -> Vector;
+
+    fn normal_at(&self, point: Point) -> Vector {
+        let local_point = self.transformation().inverse() * point;
+        let local_normal = self.local_normal_at(local_point);
+
+        let mut world_normal = self.transformation().inverse().transpose() * local_normal;
+        world_normal.3 = 0.0;
+
+        world_normal.normalize()
+    }
 }
 
 struct TestShape {
@@ -48,12 +60,18 @@ impl Shape for TestShape {
     fn local_intersect(&self, local_ray: Ray) -> Vec<Intersection> {
         panic!("{:?}", local_ray);
     }
+
+    fn local_normal_at(&self, local_point: Point) -> Vector {
+        Vector::new(local_point.0, local_point.1, local_point.2)
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::f64::consts::PI;
+
     use crate::{
-        transformation::{scaling, translation},
+        transformation::{rotation_z, scaling, translation},
         tuples::{Point, Vector},
     };
 
@@ -120,5 +138,26 @@ mod tests {
 
         s.set_transformation(translation(5.0, 0.0, 0.0));
         s.intersect(r);
+    }
+
+    #[test]
+    fn computing_normal_on_translated_shape() {
+        let mut s = TestShape::new();
+
+        s.set_transformation(translation(0.0, 1.0, 0.0));
+        let n = s.normal_at(Point::new(0.0, 1.70711, -0.70711));
+
+        assert_eq!(n, Vector::new(0.0, 0.70711, -0.70711));
+    }
+
+    #[test]
+    fn computing_normal_on_transformed_shape() {
+        let mut s = TestShape::new();
+        let m = scaling(1.0, 0.5, 1.0) * rotation_z(PI / 5.0);
+
+        s.set_transformation(m);
+        let n = s.normal_at(Point::new(0.0, 2.0_f64.sqrt() / 2.0, -2.0_f64.sqrt() / 2.0));
+
+        assert_eq!(n, Vector::new(0.0, 0.97014, -0.24254));
     }
 }
