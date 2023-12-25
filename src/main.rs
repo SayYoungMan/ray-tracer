@@ -23,5 +23,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     // experiments::clock::draw_clock()
     // experiments::circle::draw_circle()
     // experiments::sphere::draw_sphere()
-    experiments::scene::draw_scene()
+    // experiments::scene::draw_scene()
+    experiments::scene::draw_scene_with_plane()
 }
