@@ -1,4 +1,4 @@
-use uuid::Uuid;
+use std::any::Any;
 
 use crate::{
     constants::EPSILON,
@@ -13,18 +13,25 @@ use super::Shape;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Sphere {
-    id: Uuid,
     pub transformation: Matrix,
     pub material: Material,
 }
 
 impl Shape for Sphere {
-    fn new() -> Self {
-        Sphere {
-            id: Uuid::new_v4(),
-            transformation: Matrix::identity(),
-            material: Material::default(),
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn equals(&self, other: &dyn Shape) -> bool {
+        if let Some(other) = other.as_any().downcast_ref::<Sphere>() {
+            self.transformation == other.transformation && self.material == other.material
+        } else {
+            false
         }
+    }
+
+    fn material(&self) -> Material {
+        self.material
     }
 
     fn transformation(&self) -> Matrix {
@@ -57,6 +64,15 @@ impl Shape for Sphere {
 
     fn local_normal_at(&self, local_point: Point) -> Vector {
         Vector::new(local_point.0, local_point.1, local_point.2)
+    }
+}
+
+impl Sphere {
+    pub fn new() -> Self {
+        Self {
+            transformation: Matrix::identity(),
+            material: Material::default(),
+        }
     }
 }
 
@@ -175,8 +191,8 @@ mod tests {
         let xs = s.intersect(r);
 
         assert_eq!(xs.len(), 2);
-        assert_eq!(xs[0].object, &s);
-        assert_eq!(xs[1].object, &s);
+        assert!(xs[0].object.equals(&s));
+        assert!(xs[1].object.equals(&s));
     }
 
     #[test]

@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::{
     constants::EPSILON,
     rays::Ray,
@@ -7,7 +9,7 @@ use crate::{
 
 pub struct Computations<'a> {
     pub t: f64,
-    pub object: &'a Sphere,
+    pub object: &'a dyn Shape,
     pub point: Point,
     pub eyev: Vector,
     pub normalv: Vector,
@@ -15,15 +17,19 @@ pub struct Computations<'a> {
     pub over_point: Point,
 }
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Intersection<'a> {
     pub t: f64,
-    pub object: &'a Sphere,
+    pub object: &'a dyn Shape,
 }
 
 impl<'a> Intersection<'a> {
     pub fn new(t: f64, object: &'a Sphere) -> Self {
         Intersection { t, object }
+    }
+
+    fn equals(&self, other: &Intersection) -> bool {
+        self.t == other.t && self.object.equals(other.object)
     }
 
     pub fn prepare_computations(&self, ray: Ray) -> Computations<'a> {
@@ -76,7 +82,7 @@ mod tests {
         let i = Intersection::new(3.5, &s);
 
         assert_eq!(i.t, 3.5);
-        assert_eq!(i.object, &s);
+        assert!(i.object.equals(&s));
     }
 
     #[test]
@@ -88,7 +94,7 @@ mod tests {
 
         let i = hit(xs).unwrap();
 
-        assert_eq!(i, i1);
+        assert!(i.equals(&i1));
     }
 
     #[test]
@@ -100,7 +106,7 @@ mod tests {
 
         let i = hit(xs).unwrap();
 
-        assert_eq!(i, i2);
+        assert!(i.equals(&i2));
     }
 
     #[test]
@@ -126,7 +132,7 @@ mod tests {
 
         let i = hit(xs).unwrap();
 
-        assert_eq!(i, i4);
+        assert!(i.equals(&i4));
     }
 
     #[test]
@@ -141,7 +147,7 @@ mod tests {
         let comps = i.prepare_computations(r);
 
         assert_eq!(comps.t, i.t);
-        assert_eq!(comps.object, i.object);
+        assert!(comps.object.equals(i.object));
         assert_eq!(comps.point, Point::new(0.0, 0.0, -1.0));
         assert_eq!(comps.eyev, Vector::new(0.0, 0.0, -1.0));
         assert_eq!(comps.normalv, Vector::new(0.0, 0.0, -1.0));

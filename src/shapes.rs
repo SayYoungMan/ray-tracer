@@ -5,11 +5,17 @@ use crate::{
     rays::Ray,
     tuples::{Point, Vector},
 };
+use std::{any::Any, fmt::Debug};
 
+pub mod plane;
 pub mod sphere;
 
-pub trait Shape {
-    fn new() -> Self;
+pub trait Shape: Debug {
+    fn as_any(&self) -> &dyn Any;
+
+    fn equals(&self, other: &dyn Shape) -> bool;
+
+    fn material(&self) -> Material;
 
     fn transformation(&self) -> Matrix;
 
@@ -36,17 +42,27 @@ pub trait Shape {
     }
 }
 
+#[derive(Debug)]
 struct TestShape {
     transformation: Matrix,
     material: Material,
 }
 
 impl Shape for TestShape {
-    fn new() -> Self {
-        Self {
-            transformation: Matrix::identity(),
-            material: Material::default(),
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn equals(&self, other: &dyn Shape) -> bool {
+        if let Some(other) = other.as_any().downcast_ref::<TestShape>() {
+            self.transformation == other.transformation && self.material == other.material
+        } else {
+            false
         }
+    }
+
+    fn material(&self) -> Material {
+        self.material
     }
 
     fn transformation(&self) -> Matrix {
@@ -63,6 +79,15 @@ impl Shape for TestShape {
 
     fn local_normal_at(&self, local_point: Point) -> Vector {
         Vector::new(local_point.0, local_point.1, local_point.2)
+    }
+}
+
+impl TestShape {
+    fn new() -> Self {
+        Self {
+            transformation: Matrix::identity(),
+            material: Material::default(),
+        }
     }
 }
 
