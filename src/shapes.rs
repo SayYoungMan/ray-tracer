@@ -17,6 +17,8 @@ pub trait Shape: Debug {
 
     fn material(&self) -> Material;
 
+    fn set_material(&mut self, m: Material);
+
     fn transformation(&self) -> Matrix;
 
     fn set_transformation(&mut self, m: Matrix);
@@ -63,6 +65,10 @@ impl Shape for TestShape {
 
     fn material(&self) -> Material {
         self.material
+    }
+
+    fn set_material(&mut self, m: Material) {
+        self.material = m;
     }
 
     fn transformation(&self) -> Matrix {
@@ -135,7 +141,7 @@ mod tests {
             let mut m = Material::default();
             m.ambient = 1.0;
 
-            s.material = m;
+            s.set_material(m);
 
             assert_eq!(s.material, m);
         }

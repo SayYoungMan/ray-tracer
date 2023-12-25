@@ -9,7 +9,7 @@ use crate::{
 };
 
 pub struct World {
-    pub objects: Vec<Sphere>,
+    pub objects: Vec<Box<dyn Shape>>,
     pub light: PointLight,
 }
 
@@ -33,7 +33,7 @@ impl World {
         s2.set_transformation(scaling(0.5, 0.5, 0.5));
 
         Self {
-            objects: vec![s1, s2],
+            objects: vec![Box::new(s1), Box::new(s2)],
             light,
         }
     }
@@ -92,7 +92,7 @@ impl World {
 
 #[cfg(test)]
 mod tests {
-    use crate::tuples::Vector;
+    use crate::{materials::Material, tuples::Vector};
 
     use super::*;
 
@@ -125,7 +125,7 @@ mod tests {
         let shape = &w.objects[0];
         let i = Intersection {
             t: 4.0,
-            object: shape,
+            object: shape.as_ref(),
         };
 
         let comps = i.prepare_computations(r);
@@ -142,7 +142,7 @@ mod tests {
         let shape = &w.objects[1];
         let i = Intersection {
             t: 0.5,
-            object: shape,
+            object: shape.as_ref(),
         };
 
         let comps = i.prepare_computations(r);
@@ -174,14 +174,17 @@ mod tests {
     #[test]
     fn color_with_intersection_behind_ray() {
         let mut w = World::default();
-        w.objects[0].material.ambient = 1.0;
-        w.objects[1].material.ambient = 1.0;
+
+        let mut m = Material::default();
+        m.ambient = 1.0;
+
+        w.objects[1].set_material(m);
 
         let r = Ray::new(Point::new(0.0, 0.0, 0.75), Vector::new(0.0, 0.0, -1.0));
 
         let c = w.color_at(r);
 
-        assert_eq!(c, w.objects[1].material.color);
+        assert_eq!(c, w.objects[1].material().color);
     }
 
     mod shadow {
@@ -229,7 +232,7 @@ mod tests {
             let s1 = Sphere::new();
             let mut s2 = Sphere::new();
             s2.set_transformation(translation(0.0, 0.0, 10.0));
-            w.objects = vec![s1, s2.clone()];
+            w.objects = vec![Box::new(s1), Box::new(s2.clone())];
 
             let r = Ray::new(Point::new(0.0, 0.0, 5.0), Vector::new(0.0, 0.0, 1.0));
             let i = Intersection::new(4.0, &s2);

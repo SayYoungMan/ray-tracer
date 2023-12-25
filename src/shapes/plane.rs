@@ -34,6 +34,10 @@ impl Shape for Plane {
         self.material
     }
 
+    fn set_material(&mut self, m: Material) {
+        self.material = m;
+    }
+
     fn transformation(&self) -> Matrix {
         self.transformation.clone()
     }
@@ -70,6 +74,43 @@ mod tests {
     use crate::tuples::{Point, Vector};
 
     use super::*;
+
+    mod shape_default_tests {
+        use crate::transformation::translation;
+
+        use super::*;
+
+        #[test]
+        fn default_transformation() {
+            let s = Plane::new();
+            assert_eq!(s.transformation, Matrix::identity());
+        }
+
+        #[test]
+        fn assigning_transformation() {
+            let mut s = Plane::new();
+            s.set_transformation(translation(2.0, 3.0, 4.0));
+            assert_eq!(s.transformation, translation(2.0, 3.0, 4.0));
+        }
+
+        #[test]
+        fn default_material() {
+            let s = Plane::new();
+            assert_eq!(s.material, Material::default());
+        }
+
+        #[test]
+        fn assigning_material() {
+            let mut s = Plane::new();
+
+            let mut m = Material::default();
+            m.ambient = 1.0;
+
+            s.set_material(m);
+
+            assert_eq!(s.material, m);
+        }
+    }
 
     #[test]
     fn normal_of_plane_is_constant_everywhere() {

@@ -5,7 +5,7 @@ use crate::{
     color::Color,
     lights::PointLight,
     materials::Material,
-    shapes::{sphere::Sphere, Shape},
+    shapes::{plane::Plane, sphere::Sphere, Shape},
     transformation::{rotation_x, rotation_y, scaling, translation, view_transform},
     tuples::{Point, Vector},
     world::{self, World},
@@ -60,7 +60,14 @@ pub fn draw_scene() -> Result<(), Box<dyn Error>> {
 
     // The light source is white, shining from above and to the left
     let world = World {
-        objects: vec![floor, left_wall, right_wall, middle, right, left],
+        objects: vec![
+            Box::new(floor),
+            Box::new(left_wall),
+            Box::new(right_wall),
+            Box::new(middle),
+            Box::new(right),
+            Box::new(left),
+        ],
         light: PointLight::new(Point::new(-10.0, 10.0, -10.0), Color(1.0, 1.0, 1.0)),
     };
 
