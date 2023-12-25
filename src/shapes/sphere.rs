@@ -9,6 +9,8 @@ use crate::{
     tuples::{Point, Vector},
 };
 
+use super::Shape;
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct Sphere {
     id: Uuid,
@@ -16,8 +18,8 @@ pub struct Sphere {
     pub material: Material,
 }
 
-impl Sphere {
-    pub fn new() -> Self {
+impl Shape for Sphere {
+    fn new() -> Self {
         Sphere {
             id: Uuid::new_v4(),
             transformation: Matrix::identity(),
@@ -25,14 +27,20 @@ impl Sphere {
         }
     }
 
-    pub fn intersect(&self, ray: Ray) -> Vec<Intersection> {
-        let new_ray = ray.transform(self.transformation.inverse());
+    fn transformation(&self) -> Matrix {
+        self.transformation.clone()
+    }
 
+    fn set_transformation(&mut self, m: Matrix) {
+        self.transformation = m;
+    }
+
+    fn local_intersect(&self, local_ray: Ray) -> Vec<Intersection> {
         // Vector from the sphere's center to the ray origin
-        let sphere_to_ray = new_ray.origin - Point::origin();
+        let sphere_to_ray = local_ray.origin - Point::origin();
 
-        let a = new_ray.direction.dot(&new_ray.direction);
-        let b = 2.0 * new_ray.direction.dot(&sphere_to_ray);
+        let a = local_ray.direction.dot(&local_ray.direction);
+        let b = 2.0 * local_ray.direction.dot(&sphere_to_ray);
         let c = sphere_to_ray.dot(&sphere_to_ray) - 1.0;
 
         let discriminant = b.powi(2) - 4.0 * a * c;
@@ -47,18 +55,8 @@ impl Sphere {
         vec![Intersection::new(t1, &self), Intersection::new(t2, &self)]
     }
 
-    pub fn set_transformation(&mut self, m: Matrix) {
-        self.transformation = m;
-    }
-
-    pub fn normal_at(&self, world_point: Point) -> Vector {
-        let object_point = self.transformation.inverse() * world_point;
-        let object_normal = object_point - Point::origin();
-
-        let mut world_normal = self.transformation.inverse().transpose() * object_normal;
-        world_normal.3 = 0.0;
-
-        world_normal.normalize()
+    fn local_normal_at(&self, local_point: Point) -> Vector {
+        Vector::new(local_point.0, local_point.1, local_point.2)
     }
 }
 
@@ -73,6 +71,43 @@ mod tests {
     };
 
     use super::*;
+
+    mod shape_default_tests {
+        use crate::transformation::translation;
+
+        use super::*;
+
+        #[test]
+        fn default_transformation() {
+            let s = Sphere::new();
+            assert_eq!(s.transformation, Matrix::identity());
+        }
+
+        #[test]
+        fn assigning_transformation() {
+            let mut s = Sphere::new();
+            s.set_transformation(translation(2.0, 3.0, 4.0));
+            assert_eq!(s.transformation, translation(2.0, 3.0, 4.0));
+        }
+
+        #[test]
+        fn default_material() {
+            let s = Sphere::new();
+            assert_eq!(s.material, Material::default());
+        }
+
+        #[test]
+        fn assigning_material() {
+            let mut s = Sphere::new();
+
+            let mut m = Material::default();
+            m.ambient = 1.0;
+
+            s.material = m;
+
+            assert_eq!(s.material, m);
+        }
+    }
 
     #[test]
     fn ray_intersects_sphere_at_two_points() {

@@ -1,8 +1,13 @@
 use std::error::Error;
 
 use crate::{
-    canvas::Canvas, color::Color, intersection::hit, lights::PointLight, rays::Ray,
-    shapes::sphere::Sphere, tuples::Point,
+    canvas::Canvas,
+    color::Color,
+    intersection::hit,
+    lights::PointLight,
+    rays::Ray,
+    shapes::{sphere::Sphere, Shape},
+    tuples::Point,
 };
 
 pub fn draw_sphere() -> Result<(), Box<dyn Error>> {

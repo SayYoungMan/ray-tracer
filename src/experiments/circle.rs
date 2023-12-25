@@ -1,7 +1,11 @@
 use std::error::Error;
 
 use crate::{
-    canvas::Canvas, color::Color, intersection::hit, rays::Ray, shapes::sphere::Sphere,
+    canvas::Canvas,
+    color::Color,
+    intersection::hit,
+    rays::Ray,
+    shapes::{sphere::Sphere, Shape},
     tuples::Point,
 };
 
