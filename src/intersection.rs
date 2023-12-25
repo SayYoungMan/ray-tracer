@@ -24,7 +24,7 @@ pub struct Intersection<'a> {
 }
 
 impl<'a> Intersection<'a> {
-    pub fn new(t: f64, object: &'a Sphere) -> Self {
+    pub fn new(t: f64, object: &'a dyn Shape) -> Self {
         Intersection { t, object }
     }
 
