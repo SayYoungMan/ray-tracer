@@ -26,7 +26,7 @@ pub fn tick_until_fallen(canvas: &mut Canvas, env: &Environment, proj: &mut Proj
         canvas.write_pixel(
             proj.position.0 as usize,
             canvas.height - proj.position.1 as usize,
-            Color(1.0, 1.0, 1.0),
+            Color::white(),
         );
         height = proj.position.1;
     }

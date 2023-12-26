@@ -17,12 +17,12 @@ impl World {
     pub fn new() -> Self {
         Self {
             objects: Vec::new(),
-            light: PointLight::new(Point::origin(), Color(0.0, 0.0, 0.0)),
+            light: PointLight::new(Point::origin(), Color::black()),
         }
     }
 
     pub fn default() -> Self {
-        let light = PointLight::new(Point::new(-10.0, 10.0, -10.0), Color(1.0, 1.0, 1.0));
+        let light = PointLight::new(Point::new(-10.0, 10.0, -10.0), Color::white());
 
         let mut s1 = Sphere::new();
         s1.material.color = Color(0.8, 1.0, 0.6);
@@ -81,7 +81,7 @@ impl World {
         let hit = hit(intersections);
 
         if hit.is_none() {
-            return Color(0.0, 0.0, 0.0);
+            return Color::black();
         }
 
         let comps = hit.unwrap().prepare_computations(r);
@@ -101,7 +101,7 @@ mod tests {
         let w = World::new();
 
         assert_eq!(w.objects.len(), 0);
-        assert_eq!(w.light.intensity, Color(0.0, 0.0, 0.0));
+        assert_eq!(w.light.intensity, Color::black());
     }
 
     #[test]
@@ -137,7 +137,7 @@ mod tests {
     #[test]
     fn shading_intersection_from_inside() {
         let mut w = World::default();
-        w.light = PointLight::new(Point::new(0.0, 0.25, 0.0), Color(1.0, 1.0, 1.0));
+        w.light = PointLight::new(Point::new(0.0, 0.25, 0.0), Color::white());
         let r = Ray::new(Point::origin(), Vector::new(0.0, 0.0, 1.0));
         let shape = &w.objects[1];
         let i = Intersection {
@@ -158,7 +158,7 @@ mod tests {
 
         let c = w.color_at(r);
 
-        assert_eq!(c, Color(0.0, 0.0, 0.0));
+        assert_eq!(c, Color::black());
     }
 
     #[test]
@@ -227,7 +227,7 @@ mod tests {
         #[test]
         fn shade_hit_is_given_intersection_in_shadow() {
             let mut w = World::default();
-            w.light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color(1.0, 1.0, 1.0));
+            w.light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color::white());
 
             let s1 = Sphere::new();
             let mut s2 = Sphere::new();

@@ -28,6 +28,6 @@ fn draw_point(canvas: &mut Canvas, point: &Point) {
     canvas.write_pixel(
         (MID_POINT + point.2) as usize,
         (MID_POINT - point.0) as usize,
-        Color(1.0, 1.0, 1.0),
+        Color::white(),
     );
 }

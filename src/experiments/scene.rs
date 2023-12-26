@@ -68,7 +68,7 @@ pub fn draw_scene() -> Result<(), Box<dyn Error>> {
             Box::new(right),
             Box::new(left),
         ],
-        light: PointLight::new(Point::new(-10.0, 10.0, -10.0), Color(1.0, 1.0, 1.0)),
+        light: PointLight::new(Point::new(-10.0, 10.0, -10.0), Color::white()),
     };
 
     let mut camera = Camera::new(100, 50, PI / 3.0);
@@ -116,7 +116,7 @@ pub fn draw_scene_with_plane() -> Result<(), Box<dyn Error>> {
             Box::new(right),
             Box::new(left),
         ],
-        light: PointLight::new(Point::new(-10.0, 10.0, -10.0), Color(1.0, 1.0, 1.0)),
+        light: PointLight::new(Point::new(-10.0, 10.0, -10.0), Color::white()),
     };
 
     let mut camera = Camera::new(100, 50, PI / 3.0);

@@ -14,7 +14,7 @@ impl Canvas {
         let mut color_matrix = Vec::with_capacity(height);
 
         for _ in 0..height {
-            let row = vec![Color(0.0, 0.0, 0.0); width];
+            let row = vec![Color::black(); width];
             color_matrix.push(row);
         }
 
@@ -123,8 +123,8 @@ mod tests {
 
         assert_eq!(c.width, 10);
         assert_eq!(c.height, 20);
-        assert_eq!(c.pixel_at(0, 0), Color(0.0, 0.0, 0.0));
-        assert_eq!(c.pixel_at(9, 19), Color(0.0, 0.0, 0.0));
+        assert_eq!(c.pixel_at(0, 0), Color::black());
+        assert_eq!(c.pixel_at(9, 19), Color::black());
     }
 
     #[test]

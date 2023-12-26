@@ -7,6 +7,10 @@ impl Color {
     pub fn black() -> Self {
         Color(0.0, 0.0, 0.0)
     }
+
+    pub fn white() -> Self {
+        Color(1.0, 1.0, 1.0)
+    }
 }
 
 impl PartialEq for Color {

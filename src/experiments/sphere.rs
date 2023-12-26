@@ -25,7 +25,7 @@ pub fn draw_sphere() -> Result<(), Box<dyn Error>> {
     sphere.material.color = Color(1.0, 0.2, 1.0);
 
     let light_position = Point::new(-10.0, 10.0, -10.0);
-    let light_color = Color(1.0, 1.0, 1.0);
+    let light_color = Color::white();
     let light = PointLight::new(light_position, light_color);
 
     // For each row of pixels in the canvas

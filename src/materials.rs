@@ -25,7 +25,7 @@ impl Material {
     }
 
     pub fn default() -> Self {
-        Self::new(Color(1.0, 1.0, 1.0), 0.1, 0.9, 0.9, 200.0)
+        Self::new(Color::white(), 0.1, 0.9, 0.9, 200.0)
     }
 
     pub fn lighting(
@@ -84,7 +84,7 @@ mod tests {
     fn default_material() {
         let m = Material::default();
 
-        assert_eq!(m.color, Color(1.0, 1.0, 1.0));
+        assert_eq!(m.color, Color::white());
         assert_eq!(m.ambient, 0.1);
         assert_eq!(m.diffuse, 0.9);
         assert_eq!(m.specular, 0.9);
@@ -109,7 +109,7 @@ mod tests {
             // Ambient, diffuse, and specular all at full strength
             let eyev = Vector::new(0.0, 0.0, -1.0);
             let normalv = Vector::new(0.0, 0.0, -1.0);
-            let light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color(1.0, 1.0, 1.0));
+            let light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color::white());
 
             let result = M.lighting(&light, POSITION, eyev, normalv, false);
 
@@ -122,7 +122,7 @@ mod tests {
             // Specular value have fallen off to 0
             let eyev = Vector::new(0.0, 2.0_f64.sqrt() / 2.0, -2.0_f64.sqrt() / 2.0);
             let normalv = Vector::new(0.0, 0.0, -1.0);
-            let light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color(1.0, 1.0, 1.0));
+            let light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color::white());
 
             let result = M.lighting(&light, POSITION, eyev, normalv, true);
 
@@ -135,7 +135,7 @@ mod tests {
             // Specular component falls off to 0 as well
             let eyev = Vector::new(0.0, 0.0, -1.0);
             let normalv = Vector::new(0.0, 0.0, -1.0);
-            let light = PointLight::new(Point::new(0.0, 10.0, -10.0), Color(1.0, 1.0, 1.0));
+            let light = PointLight::new(Point::new(0.0, 10.0, -10.0), Color::white());
 
             let result = M.lighting(&light, POSITION, eyev, normalv, false);
 
@@ -147,7 +147,7 @@ mod tests {
             // Diffuse is the same as before but specular is at full strength
             let eyev = Vector::new(0.0, -2.0_f64.sqrt() / 2.0, -2.0_f64.sqrt() / 2.0);
             let normalv = Vector::new(0.0, 0.0, -1.0);
-            let light = PointLight::new(Point::new(0.0, 10.0, -10.0), Color(1.0, 1.0, 1.0));
+            let light = PointLight::new(Point::new(0.0, 10.0, -10.0), Color::white());
 
             let result = M.lighting(&light, POSITION, eyev, normalv, false);
 
@@ -159,7 +159,7 @@ mod tests {
             // Light no longer illuminates the surface, so the diffuse and specular go to 0
             let eyev = Vector::new(0.0, 0.0, -1.0);
             let normalv = Vector::new(0.0, 0.0, -1.0);
-            let light = PointLight::new(Point::new(0.0, 0.0, 10.0), Color(1.0, 1.0, 1.0));
+            let light = PointLight::new(Point::new(0.0, 0.0, 10.0), Color::white());
 
             let result = M.lighting(&light, POSITION, eyev, normalv, false);
 
