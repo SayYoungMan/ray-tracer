@@ -39,8 +39,13 @@ impl Material {
         normalv: Vector,
         in_shadow: bool,
     ) -> Color {
+        let color = match &self.pattern {
+            Some(pattern) => pattern.at(point),
+            None => self.color,
+        };
+
         // Combine the surface color with the light's color/intensity
-        let effective_color = self.color * light.intensity;
+        let effective_color = color * light.intensity;
 
         // Find the direction to the light source
         let lightv = (light.position - point).normalize();
@@ -109,7 +114,7 @@ mod tests {
 
     mod lighting {
         use super::*;
-        use crate::lights::PointLight;
+        use crate::{lights::PointLight, patterns::Stripe};
 
         const M: Material = Material {
             color: Color(1.0, 1.0, 1.0),
@@ -184,6 +189,22 @@ mod tests {
         }
 
         #[test]
-        fn lighting_with_pattern_applied() {}
+        fn lighting_with_pattern_applied() {
+            let mut m = Material::default();
+            m.pattern = Some(Box::new(Stripe::new(Color::white(), Color::black())));
+            m.ambient = 1.0;
+            m.diffuse = 0.0;
+            m.specular = 0.0;
+
+            let eyev = Vector::new(0.0, 0.0, -1.0);
+            let normalv = Vector::new(0.0, 0.0, -1.0);
+            let light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color::white());
+
+            let c1 = m.lighting(&light, Point::new(0.9, 0.0, 0.0), eyev, normalv, false);
+            let c2 = m.lighting(&light, Point::new(1.1, 0.0, 0.0), eyev, normalv, false);
+
+            assert_eq!(c1, Color::white());
+            assert_eq!(c2, Color::black());
+        }
     }
 }
