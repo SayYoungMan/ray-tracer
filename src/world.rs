@@ -73,6 +73,7 @@ impl World {
             comps.eyev,
             comps.normalv,
             shadowed,
+            comps.object,
         )
     }
 

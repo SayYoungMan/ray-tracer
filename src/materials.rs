@@ -2,6 +2,7 @@ use crate::{
     color::Color,
     lights::PointLight,
     patterns::Pattern,
+    shapes::Shape,
     tuples::{Point, Vector},
 };
 
@@ -38,9 +39,10 @@ impl Material {
         eyev: Vector,
         normalv: Vector,
         in_shadow: bool,
+        object: &dyn Shape,
     ) -> Color {
         let color = match &self.pattern {
-            Some(pattern) => pattern.at(point),
+            Some(pattern) => pattern.at_object(object, point),
             None => self.color,
         };
 
@@ -114,7 +116,7 @@ mod tests {
 
     mod lighting {
         use super::*;
-        use crate::{lights::PointLight, patterns::Stripe};
+        use crate::{lights::PointLight, patterns::Stripe, shapes::sphere::Sphere};
 
         const M: Material = Material {
             color: Color(1.0, 1.0, 1.0),
@@ -132,8 +134,9 @@ mod tests {
             let eyev = Vector::new(0.0, 0.0, -1.0);
             let normalv = Vector::new(0.0, 0.0, -1.0);
             let light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color::white());
+            let sphere = Sphere::new();
 
-            let result = M.lighting(&light, POSITION, eyev, normalv, false);
+            let result = M.lighting(&light, POSITION, eyev, normalv, false, &sphere);
 
             assert_eq!(result, Color(1.9, 1.9, 1.9));
         }
@@ -145,8 +148,9 @@ mod tests {
             let eyev = Vector::new(0.0, 2.0_f64.sqrt() / 2.0, -2.0_f64.sqrt() / 2.0);
             let normalv = Vector::new(0.0, 0.0, -1.0);
             let light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color::white());
+            let sphere = Sphere::new();
 
-            let result = M.lighting(&light, POSITION, eyev, normalv, true);
+            let result = M.lighting(&light, POSITION, eyev, normalv, true, &sphere);
 
             assert_eq!(result, Color(0.1, 0.1, 0.1));
         }
@@ -158,8 +162,9 @@ mod tests {
             let eyev = Vector::new(0.0, 0.0, -1.0);
             let normalv = Vector::new(0.0, 0.0, -1.0);
             let light = PointLight::new(Point::new(0.0, 10.0, -10.0), Color::white());
+            let sphere = Sphere::new();
 
-            let result = M.lighting(&light, POSITION, eyev, normalv, false);
+            let result = M.lighting(&light, POSITION, eyev, normalv, false, &sphere);
 
             assert_eq!(result, Color(0.7364, 0.7364, 0.7364));
         }
@@ -170,8 +175,9 @@ mod tests {
             let eyev = Vector::new(0.0, -2.0_f64.sqrt() / 2.0, -2.0_f64.sqrt() / 2.0);
             let normalv = Vector::new(0.0, 0.0, -1.0);
             let light = PointLight::new(Point::new(0.0, 10.0, -10.0), Color::white());
+            let sphere = Sphere::new();
 
-            let result = M.lighting(&light, POSITION, eyev, normalv, false);
+            let result = M.lighting(&light, POSITION, eyev, normalv, false, &sphere);
 
             assert_eq!(result, Color(1.6364, 1.6364, 1.6364));
         }
@@ -182,8 +188,9 @@ mod tests {
             let eyev = Vector::new(0.0, 0.0, -1.0);
             let normalv = Vector::new(0.0, 0.0, -1.0);
             let light = PointLight::new(Point::new(0.0, 0.0, 10.0), Color::white());
+            let sphere = Sphere::new();
 
-            let result = M.lighting(&light, POSITION, eyev, normalv, false);
+            let result = M.lighting(&light, POSITION, eyev, normalv, false, &sphere);
 
             assert_eq!(result, Color(0.1, 0.1, 0.1));
         }
@@ -199,9 +206,24 @@ mod tests {
             let eyev = Vector::new(0.0, 0.0, -1.0);
             let normalv = Vector::new(0.0, 0.0, -1.0);
             let light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color::white());
+            let sphere = Sphere::new();
 
-            let c1 = m.lighting(&light, Point::new(0.9, 0.0, 0.0), eyev, normalv, false);
-            let c2 = m.lighting(&light, Point::new(1.1, 0.0, 0.0), eyev, normalv, false);
+            let c1 = m.lighting(
+                &light,
+                Point::new(0.9, 0.0, 0.0),
+                eyev,
+                normalv,
+                false,
+                &sphere,
+            );
+            let c2 = m.lighting(
+                &light,
+                Point::new(1.1, 0.0, 0.0),
+                eyev,
+                normalv,
+                false,
+                &sphere,
+            );
 
             assert_eq!(c1, Color::white());
             assert_eq!(c2, Color::black());

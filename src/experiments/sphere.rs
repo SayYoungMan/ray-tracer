@@ -53,7 +53,7 @@ pub fn draw_sphere() -> Result<(), Box<dyn Error>> {
                 let color = hit
                     .object
                     .material()
-                    .lighting(&light, point, eye, normal, false);
+                    .lighting(&light, point, eye, normal, false, &sphere);
                 canvas.write_pixel(x, y, color);
             }
         }
