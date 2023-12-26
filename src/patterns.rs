@@ -1,6 +1,7 @@
 use crate::{color::Color, matrices::Matrix, shapes::Shape, tuples::Point};
 use std::{any::Any, fmt::Debug};
 
+pub mod checker;
 pub mod gradient;
 pub mod ring;
 pub mod stripe;
