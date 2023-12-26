@@ -31,7 +31,7 @@ impl Shape for Plane {
     }
 
     fn material(&self) -> Material {
-        self.material
+        self.material.clone()
     }
 
     fn set_material(&mut self, m: Material) {
@@ -106,7 +106,7 @@ mod tests {
             let mut m = Material::default();
             m.ambient = 1.0;
 
-            s.set_material(m);
+            s.set_material(m.clone());
 
             assert_eq!(s.material, m);
         }

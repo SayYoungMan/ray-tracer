@@ -19,7 +19,7 @@ pub fn draw_scene() -> Result<(), Box<dyn Error>> {
     // The floor is an extremely flattened sphere with a matte texture
     let mut floor = Sphere::new();
     floor.transformation = scaling(10.0, 0.01, 10.0);
-    floor.material = walls_material;
+    floor.material = walls_material.clone();
 
     // The wall on the left has the same scale and color as the floor but is also rotated and translated into place
     let mut left_wall = Sphere::new();
@@ -27,7 +27,7 @@ pub fn draw_scene() -> Result<(), Box<dyn Error>> {
         * rotation_y(-PI / 4.0)
         * rotation_x(PI / 2.0)
         * scaling(10.0, 0.01, 10.0);
-    left_wall.material = walls_material;
+    left_wall.material = walls_material.clone();
 
     // The wall on the right is identical to left wall but is rotated the opposite direction in y
     let mut right_wall = Sphere::new();

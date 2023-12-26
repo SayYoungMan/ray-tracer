@@ -1,16 +1,18 @@
 use crate::{
     color::Color,
     lights::PointLight,
+    patterns::Pattern,
     tuples::{Point, Vector},
 };
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq)]
 pub struct Material {
     pub color: Color,
     pub ambient: f64,
     pub diffuse: f64,
     pub specular: f64,
     pub shininess: f64,
+    pub pattern: Option<Box<dyn Pattern>>,
 }
 
 impl Material {
@@ -21,6 +23,7 @@ impl Material {
             diffuse,
             specular,
             shininess,
+            pattern: None,
         }
     }
 
@@ -76,6 +79,19 @@ impl Material {
     }
 }
 
+impl Clone for Material {
+    fn clone(&self) -> Self {
+        Self {
+            color: self.color.clone(),
+            ambient: self.ambient,
+            diffuse: self.diffuse,
+            specular: self.specular,
+            shininess: self.shininess,
+            pattern: self.pattern.as_ref().map(|p| p.clone_box()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -101,6 +117,7 @@ mod tests {
             diffuse: 0.9,
             specular: 0.9,
             shininess: 200.0,
+            pattern: None,
         };
         const POSITION: Point = Point(0.0, 0.0, 0.0, 1.0);
 
@@ -165,5 +182,8 @@ mod tests {
 
             assert_eq!(result, Color(0.1, 0.1, 0.1));
         }
+
+        #[test]
+        fn lighting_with_pattern_applied() {}
     }
 }

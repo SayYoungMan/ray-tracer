@@ -1,11 +1,27 @@
 use crate::{color::Color, tuples::Point};
+use std::{any::Any, fmt::Debug};
 
-pub trait Pattern {
-    fn new(color_a: Color, color_b: Color) -> Self;
+pub trait Pattern: Debug {
+    fn new(color_a: Color, color_b: Color) -> Self
+    where
+        Self: Sized;
 
     fn at(&self, point: Point) -> Color;
+
+    fn as_any(&self) -> &dyn Any;
+
+    fn equals(&self, other: &dyn Pattern) -> bool;
+
+    fn clone_box(&self) -> Box<dyn Pattern>;
 }
 
+impl PartialEq for Box<dyn Pattern> {
+    fn eq(&self, other: &Self) -> bool {
+        self.equals(&**other)
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct Stripe {
     a: Color,
     b: Color,
@@ -24,6 +40,22 @@ impl Pattern for Stripe {
             return self.a;
         }
         self.b
+    }
+
+    fn clone_box(&self) -> Box<dyn Pattern> {
+        Box::new(self.clone())
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn equals(&self, other: &dyn Pattern) -> bool {
+        if let Some(other) = other.as_any().downcast_ref::<Stripe>() {
+            self.a == other.a && self.b == other.b
+        } else {
+            false
+        }
     }
 }
 
