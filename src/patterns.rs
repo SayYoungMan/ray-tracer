@@ -2,6 +2,7 @@ use crate::{color::Color, matrices::Matrix, shapes::Shape, tuples::Point};
 use std::{any::Any, fmt::Debug};
 
 pub mod gradient;
+pub mod ring;
 pub mod stripe;
 
 pub trait Pattern: Debug {
