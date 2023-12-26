@@ -116,7 +116,7 @@ mod tests {
 
     mod lighting {
         use super::*;
-        use crate::{lights::PointLight, patterns::Stripe, shapes::sphere::Sphere};
+        use crate::{lights::PointLight, patterns::stripe::Stripe, shapes::sphere::Sphere};
 
         const M: Material = Material {
             color: Color(1.0, 1.0, 1.0),
