@@ -1,35 +1,49 @@
 use crate::{
     color::Color,
     lights::PointLight,
-    patterns::Pattern,
+    patterns::{solid::Solid, Pattern},
     shapes::Shape,
     tuples::{Point, Vector},
 };
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct Material {
-    pub color: Color,
     pub ambient: f64,
     pub diffuse: f64,
     pub specular: f64,
     pub shininess: f64,
-    pub pattern: Option<Box<dyn Pattern>>,
+    pub pattern: Box<dyn Pattern>,
+}
+
+impl PartialEq for Material {
+    fn eq(&self, other: &Self) -> bool {
+        self.ambient == other.ambient
+            && self.diffuse == other.diffuse
+            && self.specular == other.specular
+            && self.shininess == other.shininess
+            && self.pattern.as_ref().equals(other.pattern.as_ref())
+    }
 }
 
 impl Material {
-    pub fn new(color: Color, ambient: f64, diffuse: f64, specular: f64, shininess: f64) -> Self {
+    pub fn new(
+        ambient: f64,
+        diffuse: f64,
+        specular: f64,
+        shininess: f64,
+        pattern: Box<dyn Pattern>,
+    ) -> Self {
         Self {
-            color,
             ambient,
             diffuse,
             specular,
             shininess,
-            pattern: None,
+            pattern,
         }
     }
 
     pub fn default() -> Self {
-        Self::new(Color::white(), 0.1, 0.9, 0.9, 200.0)
+        Self::new(0.1, 0.9, 0.9, 200.0, Box::new(Solid::new(Color::white())))
     }
 
     pub fn lighting(
@@ -41,10 +55,7 @@ impl Material {
         in_shadow: bool,
         object: &dyn Shape,
     ) -> Color {
-        let color = match &self.pattern {
-            Some(pattern) => pattern.at_object(object, point),
-            None => self.color,
-        };
+        let color = self.pattern.at_object(object, point);
 
         // Combine the surface color with the light's color/intensity
         let effective_color = color * light.intensity;
@@ -89,12 +100,11 @@ impl Material {
 impl Clone for Material {
     fn clone(&self) -> Self {
         Self {
-            color: self.color.clone(),
             ambient: self.ambient,
             diffuse: self.diffuse,
             specular: self.specular,
             shininess: self.shininess,
-            pattern: self.pattern.as_ref().map(|p| p.clone_box()),
+            pattern: self.pattern.clone_box(),
         }
     }
 }
@@ -107,42 +117,50 @@ mod tests {
     fn default_material() {
         let m = Material::default();
 
-        assert_eq!(m.color, Color::white());
         assert_eq!(m.ambient, 0.1);
         assert_eq!(m.diffuse, 0.9);
         assert_eq!(m.specular, 0.9);
         assert_eq!(m.shininess, 200.0);
+        // assert_eq!(m.pattern, Box::new(Solid::new(Color::white())));
     }
 
     mod lighting {
         use super::*;
         use crate::{lights::PointLight, patterns::stripe::Stripe, shapes::sphere::Sphere};
 
-        const M: Material = Material {
-            color: Color(1.0, 1.0, 1.0),
-            ambient: 0.1,
-            diffuse: 0.9,
-            specular: 0.9,
-            shininess: 200.0,
-            pattern: None,
-        };
         const POSITION: Point = Point(0.0, 0.0, 0.0, 1.0);
 
         #[test]
         fn lighting_with_the_surface_in_shadow() {
+            let m: Material = Material {
+                ambient: 0.1,
+                diffuse: 0.9,
+                specular: 0.9,
+                shininess: 200.0,
+                pattern: Box::new(Solid::new(Color::white())),
+            };
+
             // Ambient, diffuse, and specular all at full strength
             let eyev = Vector::new(0.0, 0.0, -1.0);
             let normalv = Vector::new(0.0, 0.0, -1.0);
             let light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color::white());
             let sphere = Sphere::new();
 
-            let result = M.lighting(&light, POSITION, eyev, normalv, false, &sphere);
+            let result = m.lighting(&light, POSITION, eyev, normalv, false, &sphere);
 
             assert_eq!(result, Color(1.9, 1.9, 1.9));
         }
 
         #[test]
         fn lighting_with_eye_between_light_and_surface_with_eye_offset_45deg() {
+            let m: Material = Material {
+                ambient: 0.1,
+                diffuse: 0.9,
+                specular: 0.9,
+                shininess: 200.0,
+                pattern: Box::new(Solid::new(Color::white())),
+            };
+
             // Ambient and diffuse should still be full strength because the light and normal vectors are the same
             // Specular value have fallen off to 0
             let eyev = Vector::new(0.0, 2.0_f64.sqrt() / 2.0, -2.0_f64.sqrt() / 2.0);
@@ -150,13 +168,21 @@ mod tests {
             let light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color::white());
             let sphere = Sphere::new();
 
-            let result = M.lighting(&light, POSITION, eyev, normalv, true, &sphere);
+            let result = m.lighting(&light, POSITION, eyev, normalv, true, &sphere);
 
             assert_eq!(result, Color(0.1, 0.1, 0.1));
         }
 
         #[test]
         fn lighting_with_eye_opposite_surface_with_light_offset_45deg() {
+            let m: Material = Material {
+                ambient: 0.1,
+                diffuse: 0.9,
+                specular: 0.9,
+                shininess: 200.0,
+                pattern: Box::new(Solid::new(Color::white())),
+            };
+
             // Angle between light and normal vectors changed so diffuse changes
             // Specular component falls off to 0 as well
             let eyev = Vector::new(0.0, 0.0, -1.0);
@@ -164,33 +190,49 @@ mod tests {
             let light = PointLight::new(Point::new(0.0, 10.0, -10.0), Color::white());
             let sphere = Sphere::new();
 
-            let result = M.lighting(&light, POSITION, eyev, normalv, false, &sphere);
+            let result = m.lighting(&light, POSITION, eyev, normalv, false, &sphere);
 
             assert_eq!(result, Color(0.7364, 0.7364, 0.7364));
         }
 
         #[test]
         fn lighting_with_eye_in_path_of_reflection_vector() {
+            let m: Material = Material {
+                ambient: 0.1,
+                diffuse: 0.9,
+                specular: 0.9,
+                shininess: 200.0,
+                pattern: Box::new(Solid::new(Color::white())),
+            };
+
             // Diffuse is the same as before but specular is at full strength
             let eyev = Vector::new(0.0, -2.0_f64.sqrt() / 2.0, -2.0_f64.sqrt() / 2.0);
             let normalv = Vector::new(0.0, 0.0, -1.0);
             let light = PointLight::new(Point::new(0.0, 10.0, -10.0), Color::white());
             let sphere = Sphere::new();
 
-            let result = M.lighting(&light, POSITION, eyev, normalv, false, &sphere);
+            let result = m.lighting(&light, POSITION, eyev, normalv, false, &sphere);
 
             assert_eq!(result, Color(1.6364, 1.6364, 1.6364));
         }
 
         #[test]
         fn lighting_with_light_behind_the_surface() {
+            let m: Material = Material {
+                ambient: 0.1,
+                diffuse: 0.9,
+                specular: 0.9,
+                shininess: 200.0,
+                pattern: Box::new(Solid::new(Color::white())),
+            };
+
             // Light no longer illuminates the surface, so the diffuse and specular go to 0
             let eyev = Vector::new(0.0, 0.0, -1.0);
             let normalv = Vector::new(0.0, 0.0, -1.0);
             let light = PointLight::new(Point::new(0.0, 0.0, 10.0), Color::white());
             let sphere = Sphere::new();
 
-            let result = M.lighting(&light, POSITION, eyev, normalv, false, &sphere);
+            let result = m.lighting(&light, POSITION, eyev, normalv, false, &sphere);
 
             assert_eq!(result, Color(0.1, 0.1, 0.1));
         }
@@ -198,7 +240,7 @@ mod tests {
         #[test]
         fn lighting_with_pattern_applied() {
             let mut m = Material::default();
-            m.pattern = Some(Box::new(Stripe::new(Color::white(), Color::black())));
+            m.pattern = Box::new(Stripe::new(Color::white(), Color::black()));
             m.ambient = 1.0;
             m.diffuse = 0.0;
             m.specular = 0.0;

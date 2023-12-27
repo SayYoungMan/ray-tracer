@@ -15,7 +15,7 @@ use crate::{
 pub fn draw_chapter_10_first_page() -> Result<(), Box<dyn Error>> {
     let mut floor = Plane::new();
     let mut floor_material = Material::default();
-    floor_material.pattern = Some(Box::new(Checker::new(Color::white(), Color::black())));
+    floor_material.pattern = Box::new(Checker::new(Color::white(), Color::black()));
     floor.set_material(floor_material);
 
     let mut wall = Plane::new();
@@ -26,19 +26,16 @@ pub fn draw_chapter_10_first_page() -> Result<(), Box<dyn Error>> {
             * rotation_x(PI / 2.0),
     );
     let mut wall_material = Material::default();
-    wall_material.pattern = Some(Box::new(Stripe::new(Color::white(), Color::black())));
+    wall_material.pattern = Box::new(Stripe::new(Color::white(), Color::black()));
     wall.set_material(wall_material);
 
     let mut big_sphere = Sphere::new();
     let mut big_sphere_material = Material::default();
-    big_sphere_material.pattern = Some(Box::new(Ring::new(
-        Color(0.56, 0.93, 0.56),
-        Color(0.0, 0.2, 0.13),
-    )));
+    big_sphere_material.pattern =
+        Box::new(Ring::new(Color(0.56, 0.93, 0.56), Color(0.0, 0.2, 0.13)));
     big_sphere_material
         .pattern
         .as_mut()
-        .expect("")
         .set_transformation(scaling(0.2, 1.0, 1.5));
     big_sphere.set_material(big_sphere_material);
     big_sphere.set_transformation(
@@ -47,14 +44,11 @@ pub fn draw_chapter_10_first_page() -> Result<(), Box<dyn Error>> {
 
     let mut small_sphere = Sphere::new();
     let mut small_sphere_material = Material::default();
-    small_sphere_material.pattern = Some(Box::new(Gradient::new(
-        Color(1.0, 0.0, 0.0),
-        Color(0.0, 1.0, 0.0),
-    )));
+    small_sphere_material.pattern =
+        Box::new(Gradient::new(Color(1.0, 0.0, 0.0), Color(0.0, 1.0, 0.0)));
     small_sphere_material
         .pattern
         .as_mut()
-        .expect("")
         .set_transformation(translation(1.0, 0.0, 0.0) * scaling(2.0, 2.0, 2.0));
     small_sphere.set_material(small_sphere_material);
     small_sphere.set_transformation(

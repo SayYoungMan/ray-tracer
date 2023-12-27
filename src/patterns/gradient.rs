@@ -12,17 +12,6 @@ pub struct Gradient {
 }
 
 impl Pattern for Gradient {
-    fn new(color_a: Color, color_b: Color) -> Self
-    where
-        Self: Sized,
-    {
-        Self {
-            a: color_a,
-            b: color_b,
-            transformation: Matrix::identity(),
-        }
-    }
-
     fn at(&self, point: crate::tuples::Point) -> Color {
         let distance = self.b - self.a;
         let fraction = point.0 - zero_if_trivial(point.0.floor());
@@ -51,6 +40,19 @@ impl Pattern for Gradient {
             self.a == other.a && self.b == other.b
         } else {
             false
+        }
+    }
+}
+
+impl Gradient {
+    pub fn new(color_a: Color, color_b: Color) -> Self
+    where
+        Self: Sized,
+    {
+        Self {
+            a: color_a,
+            b: color_b,
+            transformation: Matrix::identity(),
         }
     }
 }

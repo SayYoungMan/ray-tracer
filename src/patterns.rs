@@ -4,13 +4,10 @@ use std::{any::Any, fmt::Debug};
 pub mod checker;
 pub mod gradient;
 pub mod ring;
+pub mod solid;
 pub mod stripe;
 
 pub trait Pattern: Debug {
-    fn new(color_a: Color, color_b: Color) -> Self
-    where
-        Self: Sized;
-
     fn at(&self, point: Point) -> Color;
 
     fn at_object(&self, object: &dyn Shape, world_point: Point) -> Color {
@@ -31,27 +28,12 @@ pub trait Pattern: Debug {
     fn clone_box(&self) -> Box<dyn Pattern>;
 }
 
-impl PartialEq for Box<dyn Pattern> {
-    fn eq(&self, other: &Self) -> bool {
-        self.equals(&**other)
-    }
-}
-
 #[derive(Debug)]
 struct TestPattern {
     transformation: Matrix,
 }
 
 impl Pattern for TestPattern {
-    fn new(_: Color, _: Color) -> Self
-    where
-        Self: Sized,
-    {
-        Self {
-            transformation: Matrix::identity(),
-        }
-    }
-
     fn at(&self, _: Point) -> Color {
         todo!()
     }
@@ -74,6 +56,17 @@ impl Pattern for TestPattern {
 
     fn clone_box(&self) -> Box<dyn Pattern> {
         todo!()
+    }
+}
+
+impl TestPattern {
+    fn new(_: Color, _: Color) -> Self
+    where
+        Self: Sized,
+    {
+        Self {
+            transformation: Matrix::identity(),
+        }
     }
 }
 

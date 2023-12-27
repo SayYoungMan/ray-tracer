@@ -12,17 +12,6 @@ pub struct Ring {
 }
 
 impl Pattern for Ring {
-    fn new(color_a: Color, color_b: Color) -> Self
-    where
-        Self: Sized,
-    {
-        Self {
-            a: color_a,
-            b: color_b,
-            transformation: Matrix::identity(),
-        }
-    }
-
     fn at(&self, point: crate::tuples::Point) -> Color {
         if zero_if_trivial((point.0.powi(2) + point.2.powi(2)).sqrt()).floor() % 2.0 == 0.0 {
             return self.a;
@@ -51,6 +40,19 @@ impl Pattern for Ring {
             self.a == other.a && self.b == other.b
         } else {
             false
+        }
+    }
+}
+
+impl Ring {
+    pub fn new(color_a: Color, color_b: Color) -> Self
+    where
+        Self: Sized,
+    {
+        Self {
+            a: color_a,
+            b: color_b,
+            transformation: Matrix::identity(),
         }
     }
 }

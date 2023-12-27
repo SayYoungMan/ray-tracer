@@ -12,14 +12,6 @@ pub struct Stripe {
 }
 
 impl Pattern for Stripe {
-    fn new(color_a: Color, color_b: Color) -> Self {
-        Self {
-            a: color_a,
-            b: color_b,
-            transformation: Matrix::identity(),
-        }
-    }
-
     fn at(&self, point: Point) -> Color {
         if point.0.floor() % 2.0 == 0.0 {
             return self.a;
@@ -48,6 +40,19 @@ impl Pattern for Stripe {
             self.a == other.a && self.b == other.b
         } else {
             false
+        }
+    }
+}
+
+impl Stripe {
+    pub fn new(color_a: Color, color_b: Color) -> Self
+    where
+        Self: Sized,
+    {
+        Self {
+            a: color_a,
+            b: color_b,
+            transformation: Matrix::identity(),
         }
     }
 }

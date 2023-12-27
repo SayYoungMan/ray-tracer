@@ -5,6 +5,7 @@ use crate::{
     color::Color,
     intersection::hit,
     lights::PointLight,
+    patterns::solid::Solid,
     rays::Ray,
     shapes::{sphere::Sphere, Shape},
     tuples::Point,
@@ -22,7 +23,7 @@ pub fn draw_sphere() -> Result<(), Box<dyn Error>> {
     let mut canvas = Canvas::new(CANVAS_PIXELS, CANVAS_PIXELS);
 
     let mut sphere = Sphere::new();
-    sphere.material.color = Color(1.0, 0.2, 1.0);
+    sphere.material.pattern = Box::new(Solid::new(Color(1.0, 0.2, 1.0)));
 
     let light_position = Point::new(-10.0, 10.0, -10.0);
     let light_color = Color::white();

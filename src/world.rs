@@ -2,6 +2,7 @@ use crate::{
     color::Color,
     intersection::{hit, Computations, Intersection},
     lights::PointLight,
+    patterns::solid::Solid,
     rays::Ray,
     shapes::{sphere::Sphere, Shape},
     transformation::scaling,
@@ -25,7 +26,7 @@ impl World {
         let light = PointLight::new(Point::new(-10.0, 10.0, -10.0), Color::white());
 
         let mut s1 = Sphere::new();
-        s1.material.color = Color(0.8, 1.0, 0.6);
+        s1.material.pattern = Box::new(Solid::new(Color(0.8, 1.0, 0.6)));
         s1.material.diffuse = 0.7;
         s1.material.specular = 0.2;
 
@@ -185,7 +186,13 @@ mod tests {
 
         let c = w.color_at(r);
 
-        assert_eq!(c, w.objects[1].material().color);
+        assert_eq!(
+            c,
+            w.objects[1]
+                .material()
+                .pattern
+                .at(Point::new(0.0, 0.0, 0.75))
+        );
     }
 
     mod shadow {

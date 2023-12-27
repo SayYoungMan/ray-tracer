@@ -12,17 +12,6 @@ pub struct Checker {
 }
 
 impl Pattern for Checker {
-    fn new(color_a: Color, color_b: Color) -> Self
-    where
-        Self: Sized,
-    {
-        Self {
-            a: color_a,
-            b: color_b,
-            transformation: Matrix::identity(),
-        }
-    }
-
     fn at(&self, point: crate::tuples::Point) -> Color {
         let (x, y, z) = (
             zero_if_trivial(point.0),
@@ -57,6 +46,19 @@ impl Pattern for Checker {
             self.a == other.a && self.b == other.b
         } else {
             false
+        }
+    }
+}
+
+impl Checker {
+    pub fn new(color_a: Color, color_b: Color) -> Self
+    where
+        Self: Sized,
+    {
+        Self {
+            a: color_a,
+            b: color_b,
+            transformation: Matrix::identity(),
         }
     }
 }

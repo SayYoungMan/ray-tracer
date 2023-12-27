@@ -5,6 +5,7 @@ use crate::{
     color::Color,
     lights::PointLight,
     materials::Material,
+    patterns::solid::Solid,
     shapes::{plane::Plane, sphere::Sphere, Shape},
     transformation::{rotation_x, rotation_y, scaling, translation, view_transform},
     tuples::{Point, Vector},
@@ -13,7 +14,7 @@ use crate::{
 
 pub fn draw_scene() -> Result<(), Box<dyn Error>> {
     let mut walls_material = Material::default();
-    walls_material.color = Color(1.0, 0.9, 0.9);
+    walls_material.pattern = Box::new(Solid::new(Color(1.0, 0.9, 0.9)));
     walls_material.specular = 0.0;
 
     // The floor is an extremely flattened sphere with a matte texture
@@ -40,21 +41,21 @@ pub fn draw_scene() -> Result<(), Box<dyn Error>> {
     // The large sphere in the middle is a unit sphere, translated upward slightly and colored green
     let mut middle = Sphere::new();
     middle.transformation = translation(-0.5, 1.0, 0.5);
-    middle.material.color = Color(0.1, 1.0, 0.5);
+    middle.material.pattern = Box::new(Solid::new(Color(0.1, 1.0, 0.5)));
     middle.material.diffuse = 0.7;
     middle.material.specular = 0.3;
 
     // The smaller green sphere on the right is scaled in half
     let mut right = Sphere::new();
     right.transformation = translation(1.5, 0.5, -0.5) * scaling(0.5, 0.5, 0.5);
-    right.material.color = Color(0.5, 1.0, 0.1);
+    right.material.pattern = Box::new(Solid::new(Color(0.5, 1.0, 0.1)));
     right.material.diffuse = 0.7;
     right.material.specular = 0.3;
 
     // The smallest sphere is scaled by thried, before being translated
     let mut left = Sphere::new();
     left.transformation = translation(-1.5, 0.33, -0.75) * scaling(0.33, 0.33, 0.33);
-    left.material.color = Color(1.0, 0.8, 0.1);
+    left.material.pattern = Box::new(Solid::new(Color(1.0, 0.8, 0.1)));
     left.material.diffuse = 0.7;
     left.material.specular = 0.3;
 
@@ -90,21 +91,21 @@ pub fn draw_scene_with_plane() -> Result<(), Box<dyn Error>> {
     // The large sphere in the middle is a unit sphere, translated upward slightly and colored green
     let mut middle = Sphere::new();
     middle.transformation = translation(-0.5, 1.0, 0.5);
-    middle.material.color = Color(0.1, 1.0, 0.5);
+    middle.material.pattern = Box::new(Solid::new(Color(0.1, 1.0, 0.5)));
     middle.material.diffuse = 0.7;
     middle.material.specular = 0.3;
 
     // The smaller green sphere on the right is scaled in half
     let mut right = Sphere::new();
     right.transformation = translation(1.5, 0.5, -0.5) * scaling(0.5, 0.5, 0.5);
-    right.material.color = Color(0.5, 1.0, 0.1);
+    right.material.pattern = Box::new(Solid::new(Color(0.5, 1.0, 0.1)));
     right.material.diffuse = 0.7;
     right.material.specular = 0.3;
 
     // The smallest sphere is scaled by thried, before being translated
     let mut left = Sphere::new();
     left.transformation = translation(-1.5, 0.33, -0.75) * scaling(0.33, 0.33, 0.33);
-    left.material.color = Color(1.0, 0.8, 0.1);
+    left.material.pattern = Box::new(Solid::new(Color(1.0, 0.8, 0.1)));
     left.material.diffuse = 0.7;
     left.material.specular = 0.3;
 
