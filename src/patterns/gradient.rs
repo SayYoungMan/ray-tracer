@@ -1,6 +1,6 @@
 use std::any::Any;
 
-use crate::{color::Color, matrices::Matrix};
+use crate::{color::Color, matrices::Matrix, utils::zero_if_trivial};
 
 use super::Pattern;
 
@@ -25,7 +25,7 @@ impl Pattern for Gradient {
 
     fn at(&self, point: crate::tuples::Point) -> Color {
         let distance = self.b - self.a;
-        let fraction = point.0 - point.0.floor();
+        let fraction = point.0 - zero_if_trivial(point.0.floor());
 
         self.a + distance * fraction
     }

@@ -1,6 +1,6 @@
 use std::any::Any;
 
-use crate::{color::Color, constants::EPSILON, matrices::Matrix};
+use crate::{color::Color, constants::EPSILON, matrices::Matrix, utils::zero_if_trivial};
 
 use super::Pattern;
 
@@ -9,14 +9,6 @@ pub struct Checker {
     a: Color,
     b: Color,
     transformation: Matrix,
-}
-
-fn zero_if_trivial(n: f64) -> f64 {
-    if n.abs() < EPSILON {
-        0.0
-    } else {
-        n
-    }
 }
 
 impl Pattern for Checker {

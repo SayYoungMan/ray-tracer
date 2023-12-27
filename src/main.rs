@@ -16,6 +16,7 @@ mod rays;
 mod shapes;
 mod transformation;
 mod tuples;
+mod utils;
 mod world;
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -25,5 +26,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     // experiments::circle::draw_circle()
     // experiments::sphere::draw_sphere()
     // experiments::scene::draw_scene()
-    experiments::scene::draw_scene_with_plane()
+    // experiments::scene::draw_scene_with_plane()
+    experiments::pattern::draw_chapter_10_first_page()
 }

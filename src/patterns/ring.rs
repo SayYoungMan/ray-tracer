@@ -1,6 +1,6 @@
 use std::any::Any;
 
-use crate::{color::Color, matrices::Matrix};
+use crate::{color::Color, matrices::Matrix, utils::zero_if_trivial};
 
 use super::Pattern;
 
@@ -24,7 +24,7 @@ impl Pattern for Ring {
     }
 
     fn at(&self, point: crate::tuples::Point) -> Color {
-        if (point.0.powi(2) + point.2.powi(2)).sqrt().floor() % 2.0 == 0.0 {
+        if zero_if_trivial((point.0.powi(2) + point.2.powi(2)).sqrt()).floor() % 2.0 == 0.0 {
             return self.a;
         }
         self.b
