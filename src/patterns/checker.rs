@@ -1,6 +1,6 @@
 use std::any::Any;
 
-use crate::{color::Color, matrices::Matrix};
+use crate::{color::Color, constants::EPSILON, matrices::Matrix};
 
 use super::Pattern;
 
@@ -9,6 +9,14 @@ pub struct Checker {
     a: Color,
     b: Color,
     transformation: Matrix,
+}
+
+fn zero_if_trivial(n: f64) -> f64 {
+    if n.abs() < EPSILON {
+        0.0
+    } else {
+        n
+    }
 }
 
 impl Pattern for Checker {
@@ -24,7 +32,13 @@ impl Pattern for Checker {
     }
 
     fn at(&self, point: crate::tuples::Point) -> Color {
-        if (point.0.floor() + point.1.floor() + point.2.floor()) % 2.0 == 0.0 {
+        let (x, y, z) = (
+            zero_if_trivial(point.0),
+            zero_if_trivial(point.1),
+            zero_if_trivial(point.2),
+        );
+
+        if (x.floor() as i32 + y.floor() as i32 + z.floor() as i32) % 2 == 0 {
             return self.a;
         }
         self.b
