@@ -13,6 +13,7 @@ pub struct Computations<'a> {
     pub point: Point,
     pub eyev: Vector,
     pub normalv: Vector,
+    pub reflectv: Vector,
     inside: bool,
     pub over_point: Point,
 }
@@ -49,12 +50,15 @@ impl<'a> Intersection<'a> {
         // behind the surface due to floating number errors
         let over_point = point + normalv * EPSILON;
 
+        let reflectv = ray.direction.reflect(normalv);
+
         Computations {
             t: self.t,
             object: self.object,
             point,
             eyev,
             normalv,
+            reflectv,
             inside,
             over_point,
         }
@@ -72,7 +76,7 @@ pub fn hit(intersections: Vec<Intersection>) -> Option<Intersection> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{constants::EPSILON, transformation::translation};
+    use crate::{constants::EPSILON, shapes::plane::Plane, transformation::translation};
 
     use super::*;
 
@@ -151,6 +155,23 @@ mod tests {
         assert_eq!(comps.point, Point::new(0.0, 0.0, -1.0));
         assert_eq!(comps.eyev, Vector::new(0.0, 0.0, -1.0));
         assert_eq!(comps.normalv, Vector::new(0.0, 0.0, -1.0));
+    }
+
+    #[test]
+    fn precomputing_reflection_vector() {
+        let shape = Plane::new();
+        let r = Ray::new(
+            Point::new(0.0, 1.0, -1.0),
+            Vector::new(0.0, -(2.0_f64.sqrt() / 2.0), 2.0_f64.sqrt() / 2.0),
+        );
+        let i = Intersection::new(2.0_f64.sqrt(), &shape);
+
+        let comps = i.prepare_computations(r);
+
+        assert_eq!(
+            comps.reflectv,
+            Vector::new(0.0, 2.0_f64.sqrt() / 2.0, 2.0_f64.sqrt() / 2.0)
+        )
     }
 
     #[test]
