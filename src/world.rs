@@ -90,11 +90,24 @@ impl World {
 
         self.shade_hit(comps)
     }
+
+    fn reflected_color(&self, comps: Computations) -> Color {
+        if comps.object.material().reflective == 0.0 {
+            return Color::black();
+        }
+
+        let reflect_ray = Ray::new(comps.over_point, comps.reflectv);
+        let color = self.color_at(reflect_ray);
+
+        color * comps.object.material().reflective
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{materials::Material, tuples::Vector};
+    use crate::{
+        materials::Material, shapes::plane::Plane, transformation::translation, tuples::Vector,
+    };
 
     use super::*;
 
@@ -193,6 +206,46 @@ mod tests {
                 .pattern
                 .at(Point::new(0.0, 0.0, 0.75))
         );
+    }
+
+    #[test]
+    fn reflected_color_for_nonreflective_material() {
+        let mut w = World::default();
+        let r = Ray::new(Point::origin(), Vector::new(0.0, 0.0, 1.0));
+
+        let shape = w.objects[1].as_mut();
+        let mut material = Material::new();
+        material.ambient = 1.0;
+        shape.set_material(material);
+
+        let i = Intersection::new(1.0, w.objects[1].as_ref());
+
+        let comps = i.prepare_computations(r);
+        let color = w.reflected_color(comps);
+
+        assert_eq!(color, Color::black());
+    }
+
+    #[test]
+    fn reflected_color_for_reflective_material() {
+        let mut shape = Plane::new();
+        shape.material.reflective = 0.5;
+        shape.set_transformation(translation(0.0, -1.0, 0.0));
+
+        let mut w = World::default();
+        w.objects.push(Box::new(shape));
+
+        let r = Ray::new(
+            Point::new(0.0, 0.0, -3.0),
+            Vector::new(0.0, -(2.0_f64.sqrt() / 2.0), 2.0_f64.sqrt() / 2.0),
+        );
+
+        let i = Intersection::new(2.0_f64.sqrt(), w.objects[2].as_ref());
+
+        let comps = i.prepare_computations(r);
+        let color = w.reflected_color(comps);
+
+        assert_eq!(color, Color(0.19033, 0.23792, 0.14275));
     }
 
     mod shadow {
