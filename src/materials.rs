@@ -12,6 +12,7 @@ pub struct Material {
     pub diffuse: f64,
     pub specular: f64,
     pub shininess: f64,
+    pub reflective: f64,
     pub pattern: Box<dyn Pattern>,
 }
 
@@ -32,6 +33,7 @@ impl Material {
             diffuse: 0.9,
             specular: 0.9,
             shininess: 200.0,
+            reflective: 0.0,
             pattern: Box::new(Solid::new(Color::white())),
         }
     }
@@ -94,6 +96,7 @@ impl Clone for Material {
             diffuse: self.diffuse,
             specular: self.specular,
             shininess: self.shininess,
+            reflective: self.reflective,
             pattern: self.pattern.clone_box(),
         }
     }
@@ -111,7 +114,8 @@ mod tests {
         assert_eq!(m.diffuse, 0.9);
         assert_eq!(m.specular, 0.9);
         assert_eq!(m.shininess, 200.0);
-        // assert_eq!(m.pattern, Box::new(Solid::new(Color::white())));
+        assert_eq!(m.reflective, 0.0);
+        assert!(m.pattern.equals(&Solid::new(Color::white())));
     }
 
     mod lighting {
@@ -122,13 +126,7 @@ mod tests {
 
         #[test]
         fn lighting_with_the_surface_in_shadow() {
-            let m: Material = Material {
-                ambient: 0.1,
-                diffuse: 0.9,
-                specular: 0.9,
-                shininess: 200.0,
-                pattern: Box::new(Solid::new(Color::white())),
-            };
+            let m: Material = Material::new();
 
             // Ambient, diffuse, and specular all at full strength
             let eyev = Vector::new(0.0, 0.0, -1.0);
@@ -143,13 +141,7 @@ mod tests {
 
         #[test]
         fn lighting_with_eye_between_light_and_surface_with_eye_offset_45deg() {
-            let m: Material = Material {
-                ambient: 0.1,
-                diffuse: 0.9,
-                specular: 0.9,
-                shininess: 200.0,
-                pattern: Box::new(Solid::new(Color::white())),
-            };
+            let m: Material = Material::new();
 
             // Ambient and diffuse should still be full strength because the light and normal vectors are the same
             // Specular value have fallen off to 0
@@ -165,13 +157,7 @@ mod tests {
 
         #[test]
         fn lighting_with_eye_opposite_surface_with_light_offset_45deg() {
-            let m: Material = Material {
-                ambient: 0.1,
-                diffuse: 0.9,
-                specular: 0.9,
-                shininess: 200.0,
-                pattern: Box::new(Solid::new(Color::white())),
-            };
+            let m: Material = Material::new();
 
             // Angle between light and normal vectors changed so diffuse changes
             // Specular component falls off to 0 as well
@@ -187,13 +173,7 @@ mod tests {
 
         #[test]
         fn lighting_with_eye_in_path_of_reflection_vector() {
-            let m: Material = Material {
-                ambient: 0.1,
-                diffuse: 0.9,
-                specular: 0.9,
-                shininess: 200.0,
-                pattern: Box::new(Solid::new(Color::white())),
-            };
+            let m: Material = Material::new();
 
             // Diffuse is the same as before but specular is at full strength
             let eyev = Vector::new(0.0, -2.0_f64.sqrt() / 2.0, -2.0_f64.sqrt() / 2.0);
@@ -208,13 +188,7 @@ mod tests {
 
         #[test]
         fn lighting_with_light_behind_the_surface() {
-            let m: Material = Material {
-                ambient: 0.1,
-                diffuse: 0.9,
-                specular: 0.9,
-                shininess: 200.0,
-                pattern: Box::new(Solid::new(Color::white())),
-            };
+            let m: Material = Material::new();
 
             // Light no longer illuminates the surface, so the diffuse and specular go to 0
             let eyev = Vector::new(0.0, 0.0, -1.0);
