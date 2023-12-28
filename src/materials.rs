@@ -240,7 +240,10 @@ mod tests {
         #[test]
         fn lighting_with_pattern_applied() {
             let mut m = Material::default();
-            m.pattern = Box::new(Stripe::new(Color::white(), Color::black()));
+            m.pattern = Box::new(Stripe::new(
+                Box::new(Solid::new(Color::white())),
+                Box::new(Solid::new(Color::black())),
+            ));
             m.ambient = 1.0;
             m.diffuse = 0.0;
             m.specular = 0.0;

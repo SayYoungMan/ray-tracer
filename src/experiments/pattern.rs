@@ -32,13 +32,18 @@ pub fn draw_chapter_10_first_page() -> Result<(), Box<dyn Error>> {
             * rotation_x(PI / 2.0),
     );
     let mut wall_material = Material::default();
-    wall_material.pattern = Box::new(Stripe::new(Color::white(), Color::black()));
+    wall_material.pattern = Box::new(Stripe::new(
+        Box::new(Solid::new(Color::white())),
+        Box::new(Solid::new(Color::black())),
+    ));
     wall.set_material(wall_material);
 
     let mut big_sphere = Sphere::new();
     let mut big_sphere_material = Material::default();
-    big_sphere_material.pattern =
-        Box::new(Ring::new(Color(0.56, 0.93, 0.56), Color(0.0, 0.2, 0.13)));
+    big_sphere_material.pattern = Box::new(Ring::new(
+        Box::new(Solid::new(Color(0.56, 0.93, 0.56))),
+        Box::new(Solid::new(Color(0.0, 0.2, 0.13))),
+    ));
     big_sphere_material
         .pattern
         .as_mut()
@@ -114,10 +119,16 @@ pub fn radial_gradient_floor() -> Result<(), Box<dyn Error>> {
 pub fn nested_pattern_floor() -> Result<(), Box<dyn Error>> {
     let mut floor = Plane::new();
 
-    let mut stripe_a = Stripe::new(Color(1.0, 0.753, 0.796), Color(1.0, 0.0, 1.0));
+    let mut stripe_a = Stripe::new(
+        Box::new(Solid::new(Color(1.0, 0.753, 0.796))),
+        Box::new(Solid::new(Color(1.0, 0.0, 1.0))),
+    );
     stripe_a.set_transformation(scaling(0.2, 0.2, 0.2) * rotation_y(PI / 4.0));
 
-    let mut stripe_b = Stripe::new(Color(0.6, 0.6, 0.6), Color(0.3, 0.3, 0.3));
+    let mut stripe_b = Stripe::new(
+        Box::new(Solid::new(Color(0.6, 0.6, 0.6))),
+        Box::new(Solid::new(Color(0.3, 0.3, 0.3))),
+    );
     stripe_b.set_transformation(scaling(0.2, 0.2, 0.2) * rotation_y(-PI / 4.0));
 
     let mut floor_material = Material::default();

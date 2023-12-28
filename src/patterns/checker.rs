@@ -42,7 +42,9 @@ impl Pattern for Checker {
 
     fn equals(&self, other: &dyn Pattern) -> bool {
         if let Some(other) = other.as_any().downcast_ref::<Checker>() {
-            self.a.equals(other.a.as_ref()) && self.b.equals(other.b.as_ref())
+            self.a.equals(other.a.as_ref())
+                && self.b.equals(other.b.as_ref())
+                && self.transformation == other.transformation
         } else {
             false
         }

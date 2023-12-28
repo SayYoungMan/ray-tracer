@@ -4,19 +4,22 @@ use crate::{color::Color, matrices::Matrix, utils::zero_if_trivial};
 
 use super::Pattern;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Ring {
-    a: Color,
-    b: Color,
+    a: Box<dyn Pattern>,
+    b: Box<dyn Pattern>,
     transformation: Matrix,
 }
 
 impl Pattern for Ring {
     fn at(&self, point: crate::tuples::Point) -> Color {
         if zero_if_trivial((point.0.powi(2) + point.2.powi(2)).sqrt()).floor() % 2.0 == 0.0 {
-            return self.a;
+            let local_pattern_point = self.a.transformation().inverse() * point;
+            return self.a.at(local_pattern_point);
         }
-        self.b
+
+        let local_pattern_point = self.b.transformation().inverse() * point;
+        self.b.at(local_pattern_point)
     }
 
     fn transformation(&self) -> Matrix {
@@ -37,21 +40,30 @@ impl Pattern for Ring {
 
     fn equals(&self, other: &dyn Pattern) -> bool {
         if let Some(other) = other.as_any().downcast_ref::<Ring>() {
-            self.a == other.a && self.b == other.b
+            self.a.equals(other.a.as_ref())
+                && self.b.equals(other.b.as_ref())
+                && self.transformation == other.transformation
         } else {
             false
         }
     }
 }
 
-impl Ring {
-    pub fn new(color_a: Color, color_b: Color) -> Self
-    where
-        Self: Sized,
-    {
+impl Clone for Ring {
+    fn clone(&self) -> Self {
         Self {
-            a: color_a,
-            b: color_b,
+            a: self.a.clone(),
+            b: self.b.clone(),
+            transformation: self.transformation.clone(),
+        }
+    }
+}
+
+impl Ring {
+    pub fn new(a: Box<dyn Pattern>, b: Box<dyn Pattern>) -> Self {
+        Self {
+            a,
+            b,
             transformation: Matrix::identity(),
         }
     }
@@ -59,13 +71,16 @@ impl Ring {
 
 #[cfg(test)]
 mod tests {
-    use crate::tuples::Point;
+    use crate::{patterns::solid::Solid, tuples::Point};
 
     use super::*;
 
     #[test]
     fn ring_extends_in_both_x_and_z() {
-        let ring = Ring::new(Color::white(), Color::black());
+        let ring = Ring::new(
+            Box::new(Solid::new(Color::white())),
+            Box::new(Solid::new(Color::black())),
+        );
 
         assert_eq!(ring.at(Point::origin()), Color::white());
         assert_eq!(ring.at(Point::new(1.0, 0.0, 0.0)), Color::black());
