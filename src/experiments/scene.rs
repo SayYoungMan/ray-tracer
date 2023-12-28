@@ -13,7 +13,7 @@ use crate::{
 };
 
 pub fn draw_scene() -> Result<(), Box<dyn Error>> {
-    let mut walls_material = Material::default();
+    let mut walls_material = Material::new();
     walls_material.pattern = Box::new(Solid::new(Color(1.0, 0.9, 0.9)));
     walls_material.specular = 0.0;
 

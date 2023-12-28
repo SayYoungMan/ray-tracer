@@ -17,7 +17,7 @@ use crate::{
 
 pub fn draw_chapter_10_first_page() -> Result<(), Box<dyn Error>> {
     let mut floor = Plane::new();
-    let mut floor_material = Material::default();
+    let mut floor_material = Material::new();
     floor_material.pattern = Box::new(Checker::new(
         Box::new(Solid::new(Color::white())),
         Box::new(Solid::new(Color::black())),
@@ -31,7 +31,7 @@ pub fn draw_chapter_10_first_page() -> Result<(), Box<dyn Error>> {
             * scaling(0.5, 0.5, 0.5)
             * rotation_x(PI / 2.0),
     );
-    let mut wall_material = Material::default();
+    let mut wall_material = Material::new();
     wall_material.pattern = Box::new(Stripe::new(
         Box::new(Solid::new(Color::white())),
         Box::new(Solid::new(Color::black())),
@@ -39,7 +39,7 @@ pub fn draw_chapter_10_first_page() -> Result<(), Box<dyn Error>> {
     wall.set_material(wall_material);
 
     let mut big_sphere = Sphere::new();
-    let mut big_sphere_material = Material::default();
+    let mut big_sphere_material = Material::new();
     big_sphere_material.pattern = Box::new(Ring::new(
         Box::new(Solid::new(Color(0.56, 0.93, 0.56))),
         Box::new(Solid::new(Color(0.0, 0.2, 0.13))),
@@ -54,7 +54,7 @@ pub fn draw_chapter_10_first_page() -> Result<(), Box<dyn Error>> {
     );
 
     let mut small_sphere = Sphere::new();
-    let mut small_sphere_material = Material::default();
+    let mut small_sphere_material = Material::new();
     small_sphere_material.pattern =
         Box::new(Gradient::new(Color(1.0, 0.0, 0.0), Color(0.0, 1.0, 0.0)));
     small_sphere_material
@@ -94,7 +94,7 @@ pub fn draw_chapter_10_first_page() -> Result<(), Box<dyn Error>> {
 
 pub fn radial_gradient_floor() -> Result<(), Box<dyn Error>> {
     let mut floor = Plane::new();
-    let mut floor_material = Material::default();
+    let mut floor_material = Material::new();
     floor_material.pattern = Box::new(RadialGradient::new(Color::white(), Color::black()));
     floor.set_material(floor_material);
 
@@ -131,7 +131,7 @@ pub fn nested_pattern_floor() -> Result<(), Box<dyn Error>> {
     );
     stripe_b.set_transformation(scaling(0.2, 0.2, 0.2) * rotation_y(-PI / 4.0));
 
-    let mut floor_material = Material::default();
+    let mut floor_material = Material::new();
     floor_material.pattern = Box::new(Checker::new(Box::new(stripe_a), Box::new(stripe_b)));
     floor.set_material(floor_material);
 
@@ -169,7 +169,7 @@ pub fn blended_pattern_floor() -> Result<(), Box<dyn Error>> {
     let mut stripe_b = stripe;
     stripe_b.set_transformation(rotation_y(-PI / 4.0));
 
-    let mut floor_material = Material::default();
+    let mut floor_material = Material::new();
     floor_material.pattern = Box::new(Blended::new(Box::new(stripe_a), Box::new(stripe_b)));
     floor.set_material(floor_material);
 

@@ -64,7 +64,7 @@ impl Plane {
     pub fn new() -> Self {
         Self {
             transformation: Matrix::identity(),
-            material: Material::default(),
+            material: Material::new(),
         }
     }
 }
@@ -96,14 +96,14 @@ mod tests {
         #[test]
         fn default_material() {
             let s = Plane::new();
-            assert_eq!(s.material, Material::default());
+            assert_eq!(s.material, Material::new());
         }
 
         #[test]
         fn assigning_material() {
             let mut s = Plane::new();
 
-            let mut m = Material::default();
+            let mut m = Material::new();
             m.ambient = 1.0;
 
             s.set_material(m.clone());

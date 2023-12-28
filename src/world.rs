@@ -177,7 +177,7 @@ mod tests {
     fn color_with_intersection_behind_ray() {
         let mut w = World::default();
 
-        let mut m = Material::default();
+        let mut m = Material::new();
         m.ambient = 1.0;
 
         w.objects[1].set_material(m);

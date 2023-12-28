@@ -26,24 +26,14 @@ impl PartialEq for Material {
 }
 
 impl Material {
-    pub fn new(
-        ambient: f64,
-        diffuse: f64,
-        specular: f64,
-        shininess: f64,
-        pattern: Box<dyn Pattern>,
-    ) -> Self {
+    pub fn new() -> Self {
         Self {
-            ambient,
-            diffuse,
-            specular,
-            shininess,
-            pattern,
+            ambient: 0.1,
+            diffuse: 0.9,
+            specular: 0.9,
+            shininess: 200.0,
+            pattern: Box::new(Solid::new(Color::white())),
         }
-    }
-
-    pub fn default() -> Self {
-        Self::new(0.1, 0.9, 0.9, 200.0, Box::new(Solid::new(Color::white())))
     }
 
     pub fn lighting(
@@ -115,7 +105,7 @@ mod tests {
 
     #[test]
     fn default_material() {
-        let m = Material::default();
+        let m = Material::new();
 
         assert_eq!(m.ambient, 0.1);
         assert_eq!(m.diffuse, 0.9);
@@ -239,7 +229,7 @@ mod tests {
 
         #[test]
         fn lighting_with_pattern_applied() {
-            let mut m = Material::default();
+            let mut m = Material::new();
             m.pattern = Box::new(Stripe::new(
                 Box::new(Solid::new(Color::white())),
                 Box::new(Solid::new(Color::black())),
