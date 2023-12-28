@@ -5,7 +5,10 @@ use crate::{
     color::Color,
     lights::PointLight,
     materials::Material,
-    patterns::{checker::Checker, gradient::Gradient, ring::Ring, stripe::Stripe, Pattern},
+    patterns::{
+        checker::Checker, gradient::Gradient, radial_gradient::RadialGradient, ring::Ring,
+        stripe::Stripe, Pattern,
+    },
     shapes::{plane::Plane, sphere::Sphere, Shape},
     transformation::{rotation_x, rotation_y, rotation_z, scaling, translation, view_transform},
     tuples::{Point, Vector},
@@ -77,6 +80,30 @@ pub fn draw_chapter_10_first_page() -> Result<(), Box<dyn Error>> {
 
     let canvas = camera.render(world);
     canvas.to_ppm("images/chapter_10_first_page.ppm")?;
+
+    Ok(())
+}
+
+pub fn radial_gradient_floor() -> Result<(), Box<dyn Error>> {
+    let mut floor = Plane::new();
+    let mut floor_material = Material::default();
+    floor_material.pattern = Box::new(RadialGradient::new(Color::white(), Color::black()));
+    floor.set_material(floor_material);
+
+    let world = World {
+        objects: vec![Box::new(floor)],
+        light: PointLight::new(Point::new(-10.0, 10.0, -10.0), Color(1.0, 1.0, 1.0)),
+    };
+
+    let mut camera = Camera::new(150, 75, PI / 3.0);
+    camera.transform = view_transform(
+        Point::new(0.0, 1.5, -5.0),
+        Point::new(0.0, 1.0, 0.0),
+        Vector::new(0.0, 1.0, 0.0),
+    );
+
+    let canvas = camera.render(world);
+    canvas.to_ppm("images/radial_gradient_floor.ppm")?;
 
     Ok(())
 }

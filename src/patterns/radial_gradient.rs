@@ -5,16 +5,18 @@ use crate::{color::Color, matrices::Matrix, utils::zero_if_trivial};
 use super::Pattern;
 
 #[derive(Debug, Clone)]
-pub struct Gradient {
+pub struct RadialGradient {
     a: Color,
     b: Color,
     transformation: Matrix,
 }
 
-impl Pattern for Gradient {
+impl Pattern for RadialGradient {
     fn at(&self, point: crate::tuples::Point) -> Color {
         let distance = self.b - self.a;
-        let fraction = point.0 - zero_if_trivial(point.0).floor();
+        let radial_distance_from_center = (point.0.powi(2) + point.2.powi(2)).sqrt();
+        let fraction =
+            radial_distance_from_center - zero_if_trivial(radial_distance_from_center).floor();
 
         self.a + distance * fraction
     }
@@ -36,7 +38,7 @@ impl Pattern for Gradient {
     }
 
     fn equals(&self, other: &dyn Pattern) -> bool {
-        if let Some(other) = other.as_any().downcast_ref::<Gradient>() {
+        if let Some(other) = other.as_any().downcast_ref::<RadialGradient>() {
             self.a == other.a && self.b == other.b
         } else {
             false
@@ -44,7 +46,7 @@ impl Pattern for Gradient {
     }
 }
 
-impl Gradient {
+impl RadialGradient {
     pub fn new(color_a: Color, color_b: Color) -> Self
     where
         Self: Sized,
@@ -54,28 +56,5 @@ impl Gradient {
             b: color_b,
             transformation: Matrix::identity(),
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::tuples::Point;
-
-    use super::*;
-
-    #[test]
-    fn gradient_linearly_interpolates_between_colors() {
-        let gradient = Gradient::new(Color::white(), Color::black());
-
-        assert_eq!(gradient.at(Point::origin()), Color::white());
-        assert_eq!(
-            gradient.at(Point::new(0.25, 0.0, 0.0)),
-            Color(0.75, 0.75, 0.75)
-        );
-        assert_eq!(gradient.at(Point::new(0.5, 0.0, 0.0)), Color(0.5, 0.5, 0.5));
-        assert_eq!(
-            gradient.at(Point::new(0.75, 0.0, 0.0)),
-            Color(0.25, 0.25, 0.25)
-        );
     }
 }

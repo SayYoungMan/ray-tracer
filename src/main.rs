@@ -27,5 +27,5 @@ fn main() -> Result<(), Box<dyn Error>> {
     // experiments::sphere::draw_sphere()
     // experiments::scene::draw_scene()
     // experiments::scene::draw_scene_with_plane()
-    experiments::pattern::draw_chapter_10_first_page()
+    experiments::pattern::radial_gradient_floor()
 }

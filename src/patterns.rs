@@ -3,6 +3,7 @@ use std::{any::Any, fmt::Debug};
 
 pub mod checker;
 pub mod gradient;
+pub mod radial_gradient;
 pub mod ring;
 pub mod solid;
 pub mod stripe;
