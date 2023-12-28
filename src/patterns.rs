@@ -29,6 +29,12 @@ pub trait Pattern: Debug {
     fn clone_box(&self) -> Box<dyn Pattern>;
 }
 
+impl Clone for Box<dyn Pattern> {
+    fn clone(&self) -> Self {
+        self.clone_box()
+    }
+}
+
 #[derive(Debug)]
 struct TestPattern {
     transformation: Matrix,
