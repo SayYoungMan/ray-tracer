@@ -68,14 +68,18 @@ impl World {
     fn shade_hit(&self, comps: Computations) -> Color {
         let shadowed = self.is_shadowed(comps.over_point);
 
-        comps.object.material().lighting(
+        let surface = comps.object.material().lighting(
             &self.light,
             comps.point,
             comps.eyev,
             comps.normalv,
             shadowed,
             comps.object,
-        )
+        );
+
+        let reflected = self.reflected_color(comps);
+
+        surface + reflected
     }
 
     pub fn color_at(&self, r: Ray) -> Color {
@@ -246,6 +250,28 @@ mod tests {
         let color = w.reflected_color(comps);
 
         assert_eq!(color, Color(0.19033, 0.23792, 0.14275));
+    }
+
+    #[test]
+    fn shade_hit_with_reflective_material() {
+        let mut w = World::default();
+
+        let mut shape = Plane::new();
+        shape.material.reflective = 0.5;
+        shape.set_transformation(translation(0.0, -1.0, 0.0));
+
+        w.objects.push(Box::new(shape));
+
+        let r = Ray::new(
+            Point::new(0.0, 0.0, -3.0),
+            Vector::new(0.0, -(2.0_f64.sqrt() / 2.0), 2.0_f64.sqrt() / 2.0),
+        );
+        let i = Intersection::new(2.0_f64.sqrt(), w.objects[2].as_ref());
+
+        let comps = i.prepare_computations(r);
+        let color = w.shade_hit(comps);
+
+        assert_eq!(color, Color(0.87676, 0.92434, 0.82917));
     }
 
     mod shadow {
