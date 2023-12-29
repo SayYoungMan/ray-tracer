@@ -13,6 +13,8 @@ pub struct Material {
     pub specular: f64,
     pub shininess: f64,
     pub reflective: f64,
+    pub transparency: f64,
+    pub refractive_index: f64,
     pub pattern: Box<dyn Pattern>,
 }
 
@@ -34,6 +36,8 @@ impl Material {
             specular: 0.9,
             shininess: 200.0,
             reflective: 0.0,
+            transparency: 0.0,
+            refractive_index: 1.0,
             pattern: Box::new(Solid::new(Color::white())),
         }
     }
@@ -97,6 +101,8 @@ impl Clone for Material {
             specular: self.specular,
             shininess: self.shininess,
             reflective: self.reflective,
+            transparency: self.transparency,
+            refractive_index: self.refractive_index,
             pattern: self.pattern.clone_box(),
         }
     }
@@ -115,6 +121,8 @@ mod tests {
         assert_eq!(m.specular, 0.9);
         assert_eq!(m.shininess, 200.0);
         assert_eq!(m.reflective, 0.0);
+        assert_eq!(m.transparency, 0.0);
+        assert_eq!(m.refractive_index, 1.0);
         assert!(m.pattern.equals(&Solid::new(Color::white())));
     }
 
