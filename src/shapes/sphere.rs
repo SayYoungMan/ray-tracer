@@ -78,6 +78,17 @@ impl Sphere {
             material: Material::new(),
         }
     }
+
+    pub fn glass() -> Self {
+        let mut material = Material::new();
+        material.transparency = 1.0;
+        material.refractive_index = 1.5;
+
+        Self {
+            transformation: Matrix::identity(),
+            material,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -127,6 +138,15 @@ mod tests {
 
             assert_eq!(s.material, m);
         }
+    }
+
+    #[test]
+    fn helper_for_producing_sphere_with_glassy_material() {
+        let s = Sphere::glass();
+
+        assert_eq!(s.transformation, Matrix::identity());
+        assert_eq!(s.material.transparency, 1.0);
+        assert_eq!(s.material.refractive_index, 1.5);
     }
 
     #[test]
