@@ -1,4 +1,7 @@
-use crate::{canvas::Canvas, matrices::Matrix, rays::Ray, tuples::Point, world::World};
+use crate::{
+    canvas::Canvas, constants::MAX_REFLECTION_DEPTH, matrices::Matrix, rays::Ray, tuples::Point,
+    world::World,
+};
 
 pub struct Camera {
     // Horizontal size, in pixels, of the canvas that the picture will be rendered to
@@ -70,7 +73,7 @@ impl Camera {
         for y in 0..self.vsize {
             for x in 0..self.hsize {
                 let ray = self.ray_for_pixel(x as f64, y as f64);
-                let color = world.color_at(ray);
+                let color = world.color_at(ray, MAX_REFLECTION_DEPTH);
 
                 image.write_pixel(x, y, color);
             }

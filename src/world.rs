@@ -65,7 +65,7 @@ impl World {
         }
     }
 
-    fn shade_hit(&self, comps: Computations) -> Color {
+    fn shade_hit(&self, comps: Computations, remaining: usize) -> Color {
         let shadowed = self.is_shadowed(comps.over_point);
 
         let surface = comps.object.material().lighting(
@@ -77,12 +77,12 @@ impl World {
             comps.object,
         );
 
-        let reflected = self.reflected_color(comps);
+        let reflected = self.reflected_color(comps, remaining);
 
         surface + reflected
     }
 
-    pub fn color_at(&self, r: Ray) -> Color {
+    pub fn color_at(&self, r: Ray, remaining: usize) -> Color {
         let intersections = self.intersect(r);
         let hit = hit(intersections);
 
@@ -92,16 +92,16 @@ impl World {
 
         let comps = hit.unwrap().prepare_computations(r);
 
-        self.shade_hit(comps)
+        self.shade_hit(comps, remaining)
     }
 
-    fn reflected_color(&self, comps: Computations) -> Color {
-        if comps.object.material().reflective == 0.0 {
+    fn reflected_color(&self, comps: Computations, remaining: usize) -> Color {
+        if remaining <= 0 || comps.object.material().reflective == 0.0 {
             return Color::black();
         }
 
         let reflect_ray = Ray::new(comps.over_point, comps.reflectv);
-        let color = self.color_at(reflect_ray);
+        let color = self.color_at(reflect_ray, remaining - 1);
 
         color * comps.object.material().reflective
     }
@@ -110,7 +110,8 @@ impl World {
 #[cfg(test)]
 mod tests {
     use crate::{
-        materials::Material, shapes::plane::Plane, transformation::translation, tuples::Vector,
+        constants::MAX_REFLECTION_DEPTH, materials::Material, shapes::plane::Plane,
+        transformation::translation, tuples::Vector,
     };
 
     use super::*;
@@ -148,7 +149,7 @@ mod tests {
         };
 
         let comps = i.prepare_computations(r);
-        let c = w.shade_hit(comps);
+        let c = w.shade_hit(comps, MAX_REFLECTION_DEPTH);
 
         assert_eq!(c, Color(0.38066, 0.47583, 0.2855));
     }
@@ -165,7 +166,7 @@ mod tests {
         };
 
         let comps = i.prepare_computations(r);
-        let c = w.shade_hit(comps);
+        let c = w.shade_hit(comps, MAX_REFLECTION_DEPTH);
 
         assert_eq!(c, Color(0.90498, 0.90498, 0.90498));
     }
@@ -175,7 +176,7 @@ mod tests {
         let w = World::default();
         let r = Ray::new(Point::new(0.0, 0.0, -5.0), Vector::new(0.0, 1.0, 0.0));
 
-        let c = w.color_at(r);
+        let c = w.color_at(r, MAX_REFLECTION_DEPTH);
 
         assert_eq!(c, Color::black());
     }
@@ -185,7 +186,7 @@ mod tests {
         let w = World::default();
         let r = Ray::new(Point::new(0.0, 0.0, -5.0), Vector::new(0.0, 0.0, 1.0));
 
-        let c = w.color_at(r);
+        let c = w.color_at(r, MAX_REFLECTION_DEPTH);
 
         assert_eq!(c, Color(0.38066, 0.47583, 0.2855));
     }
@@ -201,7 +202,7 @@ mod tests {
 
         let r = Ray::new(Point::new(0.0, 0.0, 0.75), Vector::new(0.0, 0.0, -1.0));
 
-        let c = w.color_at(r);
+        let c = w.color_at(r, MAX_REFLECTION_DEPTH);
 
         assert_eq!(
             c,
@@ -225,7 +226,7 @@ mod tests {
         let i = Intersection::new(1.0, w.objects[1].as_ref());
 
         let comps = i.prepare_computations(r);
-        let color = w.reflected_color(comps);
+        let color = w.reflected_color(comps, MAX_REFLECTION_DEPTH);
 
         assert_eq!(color, Color::black());
     }
@@ -247,7 +248,7 @@ mod tests {
         let i = Intersection::new(2.0_f64.sqrt(), w.objects[2].as_ref());
 
         let comps = i.prepare_computations(r);
-        let color = w.reflected_color(comps);
+        let color = w.reflected_color(comps, MAX_REFLECTION_DEPTH);
 
         assert_eq!(color, Color(0.19033, 0.23792, 0.14275));
     }
@@ -269,9 +270,50 @@ mod tests {
         let i = Intersection::new(2.0_f64.sqrt(), w.objects[2].as_ref());
 
         let comps = i.prepare_computations(r);
-        let color = w.shade_hit(comps);
+        let color = w.shade_hit(comps, MAX_REFLECTION_DEPTH);
 
         assert_eq!(color, Color(0.87676, 0.92434, 0.82917));
+    }
+
+    #[test]
+    fn color_at_with_mutually_reflective_surfaces() {
+        let mut w = World::new();
+        w.light = PointLight::new(Point::origin(), Color::white());
+
+        let mut lower = Plane::new();
+        lower.material.reflective = 1.0;
+        lower.transformation = translation(0.0, -1.0, 0.0);
+        w.objects.push(Box::new(lower));
+
+        let mut upper = Plane::new();
+        upper.material.reflective = 1.0;
+        upper.transformation = translation(0.0, 1.0, 0.0);
+        w.objects.push(Box::new(upper));
+
+        let r = Ray::new(Point::origin(), Vector::new(0.0, 1.0, 0.0));
+        w.color_at(r, MAX_REFLECTION_DEPTH);
+    }
+
+    #[test]
+    fn reflected_color_at_max_recursive_depth() {
+        let mut w = World::default();
+
+        let mut shape = Plane::new();
+        shape.material.reflective = 0.5;
+        shape.set_transformation(translation(0.0, -1.0, 0.0));
+
+        w.objects.push(Box::new(shape));
+
+        let r = Ray::new(
+            Point::new(0.0, 0.0, -3.0),
+            Vector::new(0.0, -(2.0_f64.sqrt() / 2.0), 2.0_f64.sqrt() / 2.0),
+        );
+        let i = Intersection::new(2.0_f64.sqrt(), w.objects[2].as_ref());
+
+        let comps = i.prepare_computations(r);
+        let color = w.reflected_color(comps, 0);
+
+        assert_eq!(color, Color::black());
     }
 
     mod shadow {
@@ -325,7 +367,7 @@ mod tests {
             let i = Intersection::new(4.0, &s2);
 
             let comps = i.prepare_computations(r);
-            let c = w.shade_hit(comps);
+            let c = w.shade_hit(comps, MAX_REFLECTION_DEPTH);
 
             assert_eq!(c, Color(0.1, 0.1, 0.1));
         }
